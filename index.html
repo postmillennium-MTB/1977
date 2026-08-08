@@ -420,6 +420,24 @@ a{ color: var(--gold-bright); }
   margin-bottom: 14px;
   line-height: 1.45;
 }
+.show-card__archive-link{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 6px 12px;
+  background: rgba(33,28,48,0.06);
+  border: 1px solid var(--border-paper);
+  border-radius: 999px;
+  color: var(--rose);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  transition: background .16s ease, border-color .16s ease;
+}
+.show-card__archive-link:hover{ background: rgba(194,75,63,0.12); border-color: var(--rose); }
+.show-card__archive-icon{ width: 13px; height: 13px; flex-shrink: 0; }
 .setlist-grid{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -762,6 +780,16 @@ a{ color: var(--gold-bright); }
       <h3>Show length across the year</h3>
       <div class="chart-card__caption">Total songs performed each night (set 1 + set 2 + encore), Feb&ndash;Dec.</div>
       <div id="chartScatter"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Songs per set across the year</h3>
+      <div class="chart-card__caption">How many songs landed in Set One, Set Two, or the encore, show by show.</div>
+      <div class="search-toggle" role="group" aria-label="Choose which set to chart" id="setBreakdownToggle">
+        <button class="search-toggle__opt" data-set="set1" aria-pressed="true">Set One</button>
+        <button class="search-toggle__opt" data-set="set2" aria-pressed="false">Set Two</button>
+        <button class="search-toggle__opt" data-set="encore" aria-pressed="false">Encore</button>
+      </div>
+      <div id="chartSetBreakdown"></div>
     </div>
   </section>
 
@@ -1313,6 +1341,17 @@ function renderShowCard(show, opts){
   const noteHtml = show.notes
     ? `<div class="show-card__note">${escapeHtml(show.notes)}</div>`
     : "";
+  // Links to a date-filtered search within archive.org's GratefulDead
+  // collection rather than a single hardcoded recording identifier —
+  // most dates have several tapes (soundboard, audience, matrix...),
+  // and this way the link always resolves to whatever's actually
+  // there instead of a guessed/stale identifier.
+  const archiveUrl = `https://archive.org/details/GratefulDead?and%5B%5D=date%3A%22${show.id}%22`;
+  const archiveLinkHtml = `
+    <a class="show-card__archive-link" href="${archiveUrl}" target="_blank" rel="noopener noreferrer">
+      <svg class="show-card__archive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      Listen on archive.org
+    </a>`;
   const encoreHtml = show.encore.length
     ? `<ul class="setlist-songs">${renderSongList(show.encore, opts.highlightQuery)}</ul>`
     : `<div class="no-encore">No encore documented for this show.</div>`;
@@ -1330,7 +1369,7 @@ function renderShowCard(show, opts){
       </svg>
     </button>
     <div class="show-card__setlist">
-      ${flagHtml}${noteHtml}
+      ${flagHtml}${noteHtml}${archiveLinkHtml}
       <div class="setlist-grid">
         <div class="setlist-col">
           <div class="setlist-col-title">Set One</div>
@@ -1613,21 +1652,26 @@ function renderRegionPie(){
   renderPieChart("chartPieRegion", data, "Pie chart of shows by touring region");
 }
 
-function renderScatterChart(){
-  const points = SHOWS.map((s, i)=> ({ x: i, total: totalSongsInShow(s), show: s }));
+// Shared renderer for a per-show scatter chart: one dot per show along a
+// chronological x-axis (Feb-Dec, one label per month), y-value driven by
+// valueFn. Used by both the "show length across the year" chart and the
+// per-set breakdown chart below, so the axis/grid/label logic lives in
+// exactly one place.
+function renderShowScatterChart(containerId, valueFn, color, ariaLabel, tooltipSuffix){
+  const points = SHOWS.map((s, i)=> ({ x: i, value: valueFn(s), show: s }));
   const width = 320, height = 210, padL = 26, padR = 8, padT = 10, padB = 26;
   const plotW = width - padL - padR, plotH = height - padT - padB;
-  const totals = points.map(p => p.total);
-  const maxTotal = Math.max(...totals), minTotal = Math.min(...totals);
+  const values = points.map(p => p.value);
+  const maxVal = Math.max(...values), minVal = Math.min(...values);
   const n = points.length;
 
   const xFor = i => padL + (i / (n - 1)) * plotW;
-  const yFor = total => padT + plotH - ((total - minTotal) / ((maxTotal - minTotal) || 1)) * plotH;
+  const yFor = v => padT + plotH - ((v - minVal) / ((maxVal - minVal) || 1)) * plotH;
 
   let gridLines = "";
-  const yTicks = 4;
+  const yTicks = Math.max(1, Math.min(4, maxVal - minVal));
   for (let t = 0; t <= yTicks; t++){
-    const val = Math.round(minTotal + (t / yTicks) * (maxTotal - minTotal));
+    const val = Math.round(minVal + (t / yTicks) * (maxVal - minVal));
     const y = yFor(val);
     gridLines += `<line x1="${padL}" x2="${width - padR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${THEME.textMuted}" stroke-opacity="0.15"/>`;
     gridLines += `<text x="${padL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="8.5">${val}</text>`;
@@ -1646,18 +1690,45 @@ function renderScatterChart(){
 
   let dots = "";
   points.forEach(p=>{
-    dots += `<circle cx="${xFor(p.x).toFixed(1)}" cy="${yFor(p.total).toFixed(1)}" r="3.2" fill="${THEME.gold}" fill-opacity="0.88">
-      <title>${escapeHtml(p.show.dateDisplay)} \u2014 ${escapeHtml(p.show.venue)}: ${p.total} songs</title>
+    dots += `<circle cx="${xFor(p.x).toFixed(1)}" cy="${yFor(p.value).toFixed(1)}" r="3.2" fill="${color}" fill-opacity="0.88">
+      <title>${escapeHtml(p.show.dateDisplay)} \u2014 ${escapeHtml(p.show.venue)}: ${p.value} ${tooltipSuffix}</title>
     </circle>`;
   });
 
-  document.getElementById("chartScatter").innerHTML = `
-    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of songs performed per show across 1977">
+  document.getElementById(containerId).innerHTML = `
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeHtml(ariaLabel)}">
       ${gridLines}
       <line x1="${padL}" x2="${width - padR}" y1="${(padT + plotH).toFixed(1)}" y2="${(padT + plotH).toFixed(1)}" stroke="${THEME.textMuted}" stroke-opacity="0.4"/>
       ${xLabels}
       ${dots}
     </svg>`;
+}
+
+function renderScatterChart(){
+  renderShowScatterChart("chartScatter", totalSongsInShow, THEME.gold,
+    "Scatter plot of songs performed per show across 1977", "songs");
+}
+
+// "Songs per set across the year" \u2014 same scatter layout as above, but
+// toggled between set1 / set2 / encore counts via the pill buttons in
+// #setBreakdownToggle. setBreakdownMode is the single source of truth
+// for which one is currently showing.
+const SET_BREAKDOWN_MODES = {
+  set1:   { label: "Set One", color: THEME.gold },
+  set2:   { label: "Set Two", color: THEME.rose },
+  encore: { label: "Encore",  color: THEME.teal }
+};
+let setBreakdownMode = "set1";
+
+function renderSetBreakdownChart(){
+  const mode = SET_BREAKDOWN_MODES[setBreakdownMode];
+  renderShowScatterChart(
+    "chartSetBreakdown",
+    show => show[setBreakdownMode].length,
+    mode.color,
+    `Scatter plot of songs performed in the ${mode.label} across 1977 shows`,
+    `songs in ${mode.label}`
+  );
 }
 
 let graphicsRendered = false;
@@ -1669,6 +1740,7 @@ function renderGraphicsTab(){
   renderSlotPie();
   renderRegionPie();
   renderScatterChart();
+  renderSetBreakdownChart();
   graphicsRendered = true;
 }
 
@@ -1736,6 +1808,15 @@ function init(){
     statsSortMode = statsSortMode === "count" ? "alpha" : "count";
     document.getElementById("statsSortBtn").textContent = statsSortMode === "count" ? "A\u2013Z" : "Most played";
     renderStatsTable([...songCounts(SHOWS).entries()].sort((a,b)=> b[1] - a[1]));
+  });
+  document.querySelectorAll("#setBreakdownToggle .search-toggle__opt").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if (btn.dataset.set === setBreakdownMode) return;
+      setBreakdownMode = btn.dataset.set;
+      document.querySelectorAll("#setBreakdownToggle .search-toggle__opt").forEach(b=>
+        b.setAttribute("aria-pressed", String(b === btn)));
+      renderSetBreakdownChart();
+    });
   });
 }
 

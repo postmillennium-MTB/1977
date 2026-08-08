@@ -10,10 +10,11 @@ A single-file, zero-dependency HTML tool documenting every show the Grateful Dea
 
 | Tab | What it does |
 |---|---|
-| **Shows** | All 60 shows, chronological, grouped into 5 tour legs. Tap a date to expand the full setlist. |
+| **Shows** | All 60 shows, chronological, grouped into 5 tour legs. Tap a date to expand the full setlist, which also links out to a date-filtered archive.org search for that night's recordings. |
 | **Search** | Toggle between searching venues/cities/states and searching songs. Song mode highlights the match and shows how many of the 60 shows it appeared at. |
-| **Stats** | Headline numbers (most-played song, unique songs, longest/shortest setlist, etc.) plus a full sortable ranking table of every song played. |
-| **Graphics** | Six charts: most-played songs (bar), shows by state (bar), shows by state (pie, top 5 + "Other"), set 1/set 2/encore split (pie), shows by region (pie), and setlist length across the year (scatter). |
+| **Stats** | Headline numbers (most-played song, unique songs, longest/shortest setlist, etc.), a song search box, and a full sortable ranking table of every song played. |
+| **Graphics** | Seven charts: most-played songs (bar), shows by state (bar), shows by state (pie, top 5 + "Other"), set 1/set 2/encore split (pie), shows by region (pie), setlist length across the year (scatter), and songs per set across the year (scatter, toggled between Set One / Set Two / Encore). |
+| **Quiz** | Multiple-choice trivia generated live from the `SHOWS` data — "how many times was X played?" and "which song was played more, X or Y?" — so it can't drift out of sync as shows are added. |
 
 ---
 
@@ -77,3 +78,5 @@ Everything else — the Search tab, Stats tab, and all six charts — is compute
 ## Design notes
 
 Since this is Grateful Dead content rather than mountain biking, it uses its own theme instead of the PMR trail palette: deep indigo background, marigold and dusty-rose poster-ink accents, a cream "paper" surface for expanded setlists, system-font serif/mono/sans pairing (no web fonts), and ticket-stub-style tabs with a CSS-only perforated edge as the one signature flourish. All charts are hand-rolled inline SVG — no charting library.
+
+Three color schemes are available from the buttons at the top, named after the band's keyboardists in the order they held the chair: **Godchaux** (the default — Keith Godchaux was actually on keys for this '77 tour), **Mydland** (1979–1990), and **Welnick** (1990–1995).

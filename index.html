@@ -44,23 +44,23 @@
    data/ledger numbers) so the file stays 100% dependency-free.
 --------------------------------------------------------------------- */
 :root{
-  --bg-deep:      #1E1A30;
-  --bg-panel:     #2A2444;
-  --bg-panel-hi:  #342D57;
+  --bg-deep:      #2E2850;
+  --bg-panel:     #423868;
+  --bg-panel-hi:  #544A82;
   --paper:        #F1E6C9;
   --paper-alt:    #E7D8AE;
   --ink:          #211C30;
   --ink-soft:     #524A6E;
-  --gold:         #DFA43D;
-  --gold-bright:  #F0BE5E;
-  --rose:         #C24B3F;
-  --teal:         #4C9088;
-  --plum:         #8C6BA6;
-  --text-light:   #EDE6F5;
-  --text-muted:   #A79BC4;
-  --border-soft:  rgba(223,164,61,0.20);
+  --gold:         #E6AD44;
+  --gold-bright:  #F5C563;
+  --rose:         #D35B4D;
+  --teal:         #5AA69C;
+  --plum:         #9C7AB8;
+  --text-light:   #F3EEF9;
+  --text-muted:   #BFB4D9;
+  --border-soft:  rgba(230,173,68,0.30);
   --border-paper: rgba(33,28,48,0.14);
-  --shadow-deep:  0 12px 28px rgba(10,8,20,0.35);
+  --shadow-deep:  0 12px 28px rgba(14,11,26,0.32);
 
   --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
   --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -70,8 +70,8 @@
   --radius-md: 10px;
   --radius-sm: 6px;
 
-  --glow-1: rgba(223,164,61,0.10);
-  --glow-2: rgba(194,75,63,0.10);
+  --glow-1: rgba(230,173,68,0.13);
+  --glow-2: rgba(211,91,77,0.13);
 }
 
 /* Alternate color schemes — swapped in by the "Color scheme" buttons in
@@ -87,48 +87,48 @@
 /* Mydland — 1970s/80s wood-paneled-den browns: espresso background,
    harvest-gold and rust accents, avocado green standing in for teal. */
 :root[data-theme="mydland"]{
-  --bg-deep:      #241509;
-  --bg-panel:     #3A2413;
-  --bg-panel-hi:  #4C311A;
+  --bg-deep:      #3B2812;
+  --bg-panel:     #503418;
+  --bg-panel-hi:  #654220;
   --paper:        #F0E0BC;
   --paper-alt:    #E6CFA0;
   --ink:          #2A1A0C;
   --ink-soft:     #6E4A28;
-  --gold:         #C8952E;
-  --gold-bright:  #E0AE49;
-  --rose:         #B3541F;
-  --teal:         #74863C;
-  --plum:         #8A4A2C;
-  --text-light:   #F0E0BC;
-  --text-muted:   #C7A876;
-  --border-soft:  rgba(200,149,46,0.24);
+  --gold:         #D6A03A;
+  --gold-bright:  #EFBE58;
+  --rose:         #C6642A;
+  --teal:         #869A48;
+  --plum:         #9E5B36;
+  --text-light:   #F5E7C8;
+  --text-muted:   #DCC08F;
+  --border-soft:  rgba(214,160,58,0.32);
   --border-paper: rgba(42,26,12,0.14);
-  --shadow-deep:  0 12px 28px rgba(15,8,3,0.4);
-  --glow-1: rgba(200,149,46,0.14);
-  --glow-2: rgba(116,134,60,0.12);
+  --shadow-deep:  0 12px 28px rgba(22,12,5,0.38);
+  --glow-1: rgba(214,160,58,0.17);
+  --glow-2: rgba(134,154,72,0.15);
 }
 /* Welnick — early-90s neon: near-black background, hot-pink and
    electric-violet accents, neon cyan/green standing in for teal/plum. */
 :root[data-theme="welnick"]{
-  --bg-deep:      #100812;
-  --bg-panel:     #1C0F1F;
-  --bg-panel-hi:  #2A1830;
+  --bg-deep:      #291431;
+  --bg-panel:     #3B1E45;
+  --bg-panel-hi:  #4E2A5A;
   --paper:        #FCEFF7;
   --paper-alt:    #F5DCEC;
   --ink:          #1A0E1C;
   --ink-soft:     #6B3A5C;
-  --gold:         #FF2E9A;
-  --gold-bright:  #FF6EC7;
-  --rose:         #B026FF;
-  --teal:         #00D9FF;
-  --plum:         #39FF14;
-  --text-light:   #FBEAF5;
-  --text-muted:   #B78AAE;
-  --border-soft:  rgba(255,46,154,0.28);
+  --gold:         #FF4DA8;
+  --gold-bright:  #FF7FD1;
+  --rose:         #C763FF;
+  --teal:         #3FE4FF;
+  --plum:         #6BFF4A;
+  --text-light:   #FDF0F8;
+  --text-muted:   #D8A6CB;
+  --border-soft:  rgba(255,77,168,0.36);
   --border-paper: rgba(26,14,28,0.14);
-  --shadow-deep:  0 12px 28px rgba(6,2,8,0.5);
-  --glow-1: rgba(255,46,154,0.16);
-  --glow-2: rgba(176,38,255,0.14);
+  --shadow-deep:  0 12px 28px rgba(20,7,24,0.42);
+  --glow-1: rgba(255,77,168,0.22);
+  --glow-2: rgba(199,99,255,0.20);
 }
 
 /* ---------------------------------------------------------------------
@@ -806,15 +806,15 @@ a{ color: var(--gold-bright); }
   </a>
   <div class="theme-switcher" role="group" aria-label="Color scheme">
     <button class="theme-btn" id="theme-btn-godchaux" data-theme="godchaux" aria-pressed="true">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#1E1A30 0 33%, #DFA43D 0 66%, #C24B3F 0 100%)"></span>
+      <span class="theme-btn__swatch" style="background:conic-gradient(#2E2850 0 33%, #E6AD44 0 66%, #D35B4D 0 100%)"></span>
       Godchaux
     </button>
     <button class="theme-btn" id="theme-btn-mydland" data-theme="mydland" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#241509 0 33%, #C8952E 0 66%, #B3541F 0 100%)"></span>
+      <span class="theme-btn__swatch" style="background:conic-gradient(#3B2812 0 33%, #D6A03A 0 66%, #C6642A 0 100%)"></span>
       Mydland
     </button>
     <button class="theme-btn" id="theme-btn-welnick" data-theme="welnick" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#100812 0 33%, #FF2E9A 0 66%, #B026FF 0 100%)"></span>
+      <span class="theme-btn__swatch" style="background:conic-gradient(#291431 0 33%, #FF4DA8 0 66%, #C763FF 0 100%)"></span>
       Welnick
     </button>
   </div>
@@ -1325,9 +1325,9 @@ const TOUR_LEGS = [
    attributes across older renderers. If you change a color in the CSS
    :root block, mirror the change here too. */
 const THEME = {
-  gold: "#DFA43D", goldBright: "#F0BE5E", rose: "#C24B3F",
-  teal: "#4C9088", plum: "#8C6BA6", ink: "#211C30",
-  paper: "#F1E6C9", textMuted: "#A79BC4", bgPanel: "#2A2444"
+  gold: "#E6AD44", goldBright: "#F5C563", rose: "#D35B4D",
+  teal: "#5AA69C", plum: "#9C7AB8", ink: "#211C30",
+  paper: "#F1E6C9", textMuted: "#BFB4D9", bgPanel: "#423868"
 };
 
 /* =====================================================================

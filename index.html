@@ -84,47 +84,51 @@
    same custom properties from [1] above, so every component that
    already consumes var(--whatever) repaints automatically; nothing
    else in this file needs to know a scheme switch happened. */
+/* Mydland — 1970s/80s wood-paneled-den browns: espresso background,
+   harvest-gold and rust accents, avocado green standing in for teal. */
 :root[data-theme="mydland"]{
-  --bg-deep:      #2B1B12;
-  --bg-panel:     #3B2818;
-  --bg-panel-hi:  #4A331F;
-  --paper:        #FBEFD8;
-  --paper-alt:    #F3E2BE;
-  --ink:          #2B1B12;
-  --ink-soft:     #6B4A2E;
-  --gold:         #E08E2B;
-  --gold-bright:  #F5AC3E;
-  --rose:         #C4522B;
-  --teal:         #6E8C4A;
-  --plum:         #A65D3E;
-  --text-light:   #F5E9D6;
-  --text-muted:   #C9A87E;
-  --border-soft:  rgba(224,142,43,0.22);
-  --border-paper: rgba(43,27,18,0.14);
-  --shadow-deep:  0 12px 28px rgba(20,10,4,0.35);
-  --glow-1: rgba(224,142,43,0.14);
-  --glow-2: rgba(110,140,74,0.12);
+  --bg-deep:      #241509;
+  --bg-panel:     #3A2413;
+  --bg-panel-hi:  #4C311A;
+  --paper:        #F0E0BC;
+  --paper-alt:    #E6CFA0;
+  --ink:          #2A1A0C;
+  --ink-soft:     #6E4A28;
+  --gold:         #C8952E;
+  --gold-bright:  #E0AE49;
+  --rose:         #B3541F;
+  --teal:         #74863C;
+  --plum:         #8A4A2C;
+  --text-light:   #F0E0BC;
+  --text-muted:   #C7A876;
+  --border-soft:  rgba(200,149,46,0.24);
+  --border-paper: rgba(42,26,12,0.14);
+  --shadow-deep:  0 12px 28px rgba(15,8,3,0.4);
+  --glow-1: rgba(200,149,46,0.14);
+  --glow-2: rgba(116,134,60,0.12);
 }
+/* Welnick — early-90s neon: near-black background, hot-pink and
+   electric-violet accents, neon cyan/green standing in for teal/plum. */
 :root[data-theme="welnick"]{
-  --bg-deep:      #0E1826;
-  --bg-panel:     #16273A;
-  --bg-panel-hi:  #1E3348;
-  --paper:        #E8EEF2;
-  --paper-alt:    #DCE6EC;
-  --ink:          #16273A;
-  --ink-soft:     #4C6478;
-  --gold:         #3FA9C9;
-  --gold-bright:  #5BCBE8;
-  --rose:         #C24B6A;
-  --teal:         #2F8F8A;
-  --plum:         #6B7FB8;
-  --text-light:   #E7F1F6;
-  --text-muted:   #86A0B4;
-  --border-soft:  rgba(63,169,201,0.22);
-  --border-paper: rgba(22,39,58,0.14);
-  --shadow-deep:  0 12px 28px rgba(4,10,16,0.35);
-  --glow-1: rgba(63,169,201,0.12);
-  --glow-2: rgba(194,75,106,0.10);
+  --bg-deep:      #100812;
+  --bg-panel:     #1C0F1F;
+  --bg-panel-hi:  #2A1830;
+  --paper:        #FCEFF7;
+  --paper-alt:    #F5DCEC;
+  --ink:          #1A0E1C;
+  --ink-soft:     #6B3A5C;
+  --gold:         #FF2E9A;
+  --gold-bright:  #FF6EC7;
+  --rose:         #B026FF;
+  --teal:         #00D9FF;
+  --plum:         #39FF14;
+  --text-light:   #FBEAF5;
+  --text-muted:   #B78AAE;
+  --border-soft:  rgba(255,46,154,0.28);
+  --border-paper: rgba(26,14,28,0.14);
+  --shadow-deep:  0 12px 28px rgba(6,2,8,0.5);
+  --glow-1: rgba(255,46,154,0.16);
+  --glow-2: rgba(176,38,255,0.14);
 }
 
 /* ---------------------------------------------------------------------
@@ -806,11 +810,11 @@ a{ color: var(--gold-bright); }
       Godchaux
     </button>
     <button class="theme-btn" id="theme-btn-mydland" data-theme="mydland" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#2B1B12 0 33%, #E08E2B 0 66%, #6E8C4A 0 100%)"></span>
+      <span class="theme-btn__swatch" style="background:conic-gradient(#241509 0 33%, #C8952E 0 66%, #B3541F 0 100%)"></span>
       Mydland
     </button>
     <button class="theme-btn" id="theme-btn-welnick" data-theme="welnick" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#0E1826 0 33%, #3FA9C9 0 66%, #C24B6A 0 100%)"></span>
+      <span class="theme-btn__swatch" style="background:conic-gradient(#100812 0 33%, #FF2E9A 0 66%, #B026FF 0 100%)"></span>
       Welnick
     </button>
   </div>

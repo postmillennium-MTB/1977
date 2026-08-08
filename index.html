@@ -958,6 +958,13 @@ a{ color: var(--gold-bright); }
       "flag" string instead of guessing silently — see 1977-11-01 or
       1977-12-30 below for the pattern. Honesty about confidence beats
       false precision.
+   6. The "Listen on archive.org" link on every show card defaults to a
+      date-filtered search (always resolves to whatever recordings
+      exist for that date, since most dates have several tapes). If you
+      know the exact canonical archive.org identifier for a show, set
+      "archiveId" to it (the part after /details/, e.g.
+      "gd77-10-01.sbd.unknown.277.sbeok.shnf") and the card will link
+      straight to that recording instead — see 1977-10-01 below.
 
    SONG OBJECT SHAPE
    ------------------------------------------------------------------
@@ -978,7 +985,8 @@ const SHOW_TEMPLATE = {
   set2: ["Song Three"],
   encore: [],                    // empty array if no encore
   notes: "",                     // optional 1-sentence factual note
-  flag: ""                       // optional: note if a set break/encore is inferred
+  flag: "",                      // optional: note if a set break/encore is inferred
+  archiveId: ""                  // optional: exact archive.org identifier, see note 6 above
 };
 
 const SHOWS = [
@@ -1188,7 +1196,8 @@ const SHOWS = [
 { id:"1977-10-01", dateDisplay:"Oct 1, 1977", venue:"Paramount Theatre", city:"Portland", state:"OR",
   set1:["Promised Land","They Love Each Other","Mexicali Blues","Dire Wolf","Cassidy","Deal","Passenger","Tennessee Jed","New Minglewood Blues","Peggy-O","The Music Never Stopped"],
   set2:["Bertha","Good Lovin'","It Must Have Been the Roses","Estimated Prophet","Eyes of the World","Dancin' in the Streets","Drums","Not Fade Away","Black Peter","Around and Around"],
-  encore:[] },
+  encore:[],
+  archiveId:"gd77-10-01.sbd.unknown.277.sbeok.shnf" },
 
 { id:"1977-10-02", dateDisplay:"Oct 2, 1977", venue:"Paramount Theatre", city:"Portland", state:"OR",
   set1:["Casey Jones","Jack Straw","Sunrise","Brown-Eyed Women","El Paso","Dupree's Diamond Blues","Let It Grow","Deal"],
@@ -1214,7 +1223,8 @@ const SHOWS = [
 { id:"1977-10-11", dateDisplay:"Oct 11, 1977", venue:"Lloyd Noble Center, University of Oklahoma", city:"Norman", state:"OK",
   set1:["Help on the Way","Slipknot!","Franklin's Tower","Jack Straw","Peggy-O","El Paso","Sunrise","Deal","Let It Grow"],
   set2:["Dancin' in the Streets","Dire Wolf","Estimated Prophet","Eyes of the World","Not Fade Away","Wharf Rat","Around and Around"],
-  encore:[] },
+  encore:[],
+  notes:"Officially released as Road Trips Vol. 1 No. 2." },
 
 { id:"1977-10-12", dateDisplay:"Oct 12, 1977", venue:"Manor Downs", city:"Austin", state:"TX",
   set1:["Promised Land","They Love Each Other","Me and My Uncle","Candyman","Passenger","Brown-Eyed Women","El Paso","Friend of the Devil","Lazy Lightning","Supplication","Deal"],
@@ -1470,12 +1480,14 @@ function renderShowCard(show, opts){
   const noteHtml = show.notes
     ? `<div class="show-card__note">${escapeHtml(show.notes)}</div>`
     : "";
-  // Links to a date-filtered search within archive.org's GratefulDead
-  // collection rather than a single hardcoded recording identifier —
-  // most dates have several tapes (soundboard, audience, matrix...),
-  // and this way the link always resolves to whatever's actually
-  // there instead of a guessed/stale identifier.
-  const archiveUrl = `https://archive.org/details/GratefulDead?and%5B%5D=date%3A%22${show.id}%22`;
+  // If a specific archiveId is on record, link straight to that
+  // recording. Otherwise fall back to a date-filtered search within
+  // archive.org's GratefulDead collection — most dates have several
+  // tapes (soundboard, audience, matrix...), so this always resolves
+  // to whatever's actually there instead of a guessed/stale identifier.
+  const archiveUrl = show.archiveId
+    ? `https://archive.org/details/${encodeURIComponent(show.archiveId)}`
+    : `https://archive.org/details/GratefulDead?and%5B%5D=date%3A%22${show.id}%22`;
   const archiveLinkHtml = `
     <a class="show-card__archive-link" href="${archiveUrl}" target="_blank" rel="noopener noreferrer">
       <svg class="show-card__archive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>

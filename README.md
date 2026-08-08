@@ -56,6 +56,7 @@ Where a show in this dataset was released as part of an official Grateful Dead /
 | May 28 | Hartford | *To Terrapin: Hartford '77* |
 | Jun 7–9 | Winterland | *Winterland June 1977: The Complete Recordings* |
 | Oct 1–2 | Portland | Dave's Picks Vol. 45 |
+| Oct 11 | Norman, OK | Road Trips Vol. 1 No. 2 |
 | Nov 5 | Rochester | Dick's Picks Vol. 34 |
 | Nov 6 | Binghamton | Dave's Picks Vol. 25 |
 | Dec 29 | Winterland | Dick's Picks Vol. 10 |

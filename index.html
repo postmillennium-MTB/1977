@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grateful Dead 1977 — Setlist Atlas</title>
+<meta name="description" content="A complete, searchable archive of every Grateful Dead show played in 1977: full setlists, song stats, and visualizations.">
+
+<style>
+/* =====================================================================
+   GRATEFUL DEAD 1977 — SETLIST ATLAS
+   =====================================================================
+   Built for Post Millennium Renaissance-style standalone tools:
+   single file, zero external dependencies (no CDN fonts, no chart
+   libraries, no icon fonts — everything below is hand-rolled).
+
+   TABLE OF CONTENTS (search for these tags to jump around):
+     [1] THEME BOOTSTRAP    - CSS custom properties, the "one place"
+                               to change if you ever want a different
+                               palette or type system.
+     [2] RESET & BASE
+     [3] LAYOUT / HEADER
+     [4] TAB NAVIGATION      - the "ticket stub" tabs
+     [5] SHOW CARDS          - the accordion list on the Shows tab
+     [6] SEARCH TAB
+     [7] STATS TAB
+     [8] GRAPHICS TAB / SVG CHARTS
+     [9] SHARED UI (badges, empty states, footer)
+     [10] RESPONSIVE + ACCESSIBILITY (reduced motion, focus rings)
+   ===================================================================== */
+
+/* ---------------------------------------------------------------------
+   [1] THEME BOOTSTRAP
+   Design direction: a 1977 tour-poster / archival-ledger hybrid.
+   Deep indigo night sky (the outdoor-lot, house-lights-down feeling),
+   warm marigold + dusty rose as the two poster-ink accents, a cream
+   "paper" surface for anything meant to read like a printed setlist,
+   and teal/plum held in reserve for chart series only.
+   All type is system-font stacks (serif display, sans body, mono for
+   data/ledger numbers) so the file stays 100% dependency-free.
+--------------------------------------------------------------------- */
+:root{
+  --bg-deep:      #1E1A30;
+  --bg-panel:     #2A2444;
+  --bg-panel-hi:  #342D57;
+  --paper:        #F1E6C9;
+  --paper-alt:    #E7D8AE;
+  --ink:          #211C30;
+  --ink-soft:     #524A6E;
+  --gold:         #DFA43D;
+  --gold-bright:  #F0BE5E;
+  --rose:         #C24B3F;
+  --teal:         #4C9088;
+  --plum:         #8C6BA6;
+  --text-light:   #EDE6F5;
+  --text-muted:   #A79BC4;
+  --border-soft:  rgba(223,164,61,0.20);
+  --border-paper: rgba(33,28,48,0.14);
+  --shadow-deep:  0 12px 28px rgba(10,8,20,0.35);
+
+  --font-display: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:    ui-monospace, 'Cascadia Code', 'SF Mono', Consolas, 'Courier New', monospace;
+
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+}
+
+/* ---------------------------------------------------------------------
+   [2] RESET & BASE
+--------------------------------------------------------------------- */
+*, *::before, *::after{ box-sizing: border-box; }
+html{ -webkit-text-size-adjust: 100%; }
+body{
+  margin: 0;
+  background: var(--bg-deep);
+  background-image:
+    radial-gradient(ellipse 900px 500px at 15% -10%, rgba(223,164,61,0.10), transparent 60%),
+    radial-gradient(ellipse 700px 500px at 110% 10%, rgba(194,75,63,0.10), transparent 55%);
+  color: var(--text-light);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+h1,h2,h3,h4{ font-family: var(--font-display); font-weight: 700; margin: 0; }
+p{ margin: 0; }
+button{ font-family: inherit; }
+ul{ margin:0; padding:0; list-style:none; }
+a{ color: var(--gold-bright); }
+
+/* keyboard focus is always visible — quality floor, not optional */
+:focus-visible{
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------------------------------------------------------------------
+   [3] LAYOUT / HEADER
+--------------------------------------------------------------------- */
+.wrap{
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}
+.site-header{
+  padding: 36px 16px 22px;
+  text-align: center;
+}
+.site-header__eyebrow{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+.site-header__title{
+  font-size: clamp(28px, 6vw, 44px);
+  letter-spacing: 0.01em;
+  color: var(--paper);
+  margin: 6px 0 4px;
+}
+.site-header__title em{
+  font-style: normal;
+  color: var(--gold-bright);
+}
+.site-header__sub{
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.site-header__rule{
+  width: 64px;
+  height: 2px;
+  margin: 16px auto 0;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* ---------------------------------------------------------------------
+   [4] TAB NAVIGATION — "ticket stub" tabs
+   Signature element: the active tab lifts, and its bottom edge gets a
+   row of punched-out half-circles (a repeating radial-gradient trick)
+   so it reads like a torn ticket stub sitting above the paper below.
+--------------------------------------------------------------------- */
+.tab-nav{
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 3px;
+  padding: 14px 4px 0;
+  background: linear-gradient(var(--bg-deep) 78%, transparent);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tab-nav::-webkit-scrollbar{ display:none; }
+.tab-btn{
+  position: relative;
+  flex: 0 0 auto;
+  padding: 11px 16px 15px;
+  background: var(--bg-panel);
+  border: none;
+  border-radius: 9px 9px 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: transform .16s ease, color .16s ease, background .16s ease;
+  white-space: nowrap;
+}
+.tab-btn:hover{ color: var(--paper); }
+.tab-btn[aria-selected="true"]{
+  background: var(--paper);
+  color: var(--ink);
+  transform: translateY(-3px);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.18);
+}
+.tab-btn[aria-selected="true"]::after{
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 7px;
+  background-image: radial-gradient(circle at 7px 0, transparent 4px, var(--paper) 4.4px);
+  background-size: 14px 7px;
+  background-repeat: repeat-x;
+}
+.tab-btn__count{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  opacity: .65;
+  margin-left: 4px;
+}
+
+.tab-panel{ display: none; padding-top: 22px; }
+.tab-panel.is-active{ display: block; }
+
+/* ---------------------------------------------------------------------
+   [5] SHOW CARDS — accordion list (Shows tab + Search results)
+--------------------------------------------------------------------- */
+.tour-meta{
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 18px;
+  padding: 0 8px;
+}
+.tour-meta b{ color: var(--gold-bright); font-weight: 600; }
+
+.leg-divider{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 2px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rose);
+}
+.leg-divider::after{
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-soft);
+}
+
+.show-card{
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.show-card__header{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 13px 14px;
+  background: none;
+  border: none;
+  color: var(--text-light);
+  text-align: left;
+  cursor: pointer;
+}
+.show-card__header:hover{ background: var(--bg-panel-hi); }
+.show-card__date{
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--gold-bright);
+  min-width: 78px;
+  flex-shrink: 0;
+}
+.show-card__body{ flex: 1; min-width: 0; }
+.show-card__venue{
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  line-height: 1.25;
+}
+.show-card__place{
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.show-card__chevron{
+  flex-shrink: 0;
+  width: 18px; height: 18px;
+  color: var(--gold);
+  transition: transform .18s ease;
+}
+.show-card[data-open="true"] .show-card__chevron{ transform: rotate(180deg); }
+
+.show-card__setlist{
+  display: none;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 18px 18px 20px;
+}
+.show-card[data-open="true"] .show-card__setlist{ display: block; }
+
+.show-card__flag{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-soft);
+  background: rgba(33,28,48,0.06);
+  border: 1px dashed rgba(33,28,48,0.25);
+  border-radius: 5px;
+  padding: 6px 9px;
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+.show-card__note{
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-bottom: 14px;
+  line-height: 1.45;
+}
+.setlist-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 22px;
+}
+.setlist-col--full{ grid-column: 1 / -1; }
+.setlist-col-title{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rose);
+  border-bottom: 1px solid var(--border-paper);
+  padding-bottom: 5px;
+  margin-bottom: 8px;
+}
+.setlist-songs{ counter-reset: song; }
+.setlist-songs li{
+  counter-increment: song;
+  font-size: 13.5px;
+  line-height: 1.65;
+  padding-left: 22px;
+  position: relative;
+}
+.setlist-songs li::before{
+  content: counter(song) '.';
+  position: absolute;
+  left: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  opacity: .6;
+}
+.setlist-songs li.is-segue{ margin-bottom: 0; }
+.segue-arrow{ color: var(--rose); font-weight: 700; margin-left: 3px; }
+.song-hit{ background: rgba(194,75,63,0.18); border-radius: 3px; padding: 0 3px; }
+
+.no-encore{ font-size: 12.5px; color: var(--ink-soft); font-style: italic; }
+
+/* ---------------------------------------------------------------------
+   [6] SEARCH TAB
+--------------------------------------------------------------------- */
+.search-toggle{
+  display: flex;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+.search-toggle__opt{
+  flex: 1;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .16s ease, color .16s ease;
+}
+.search-toggle__opt[aria-pressed="true"]{
+  background: var(--gold);
+  color: var(--ink);
+}
+.search-input-wrap{ position: relative; margin-bottom: 6px; }
+.search-input{
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  color: var(--text-light);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+.search-input::placeholder{ color: var(--text-muted); }
+.search-input:focus{ border-color: var(--gold); }
+.search-hint{
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin: 8px 2px 18px;
+}
+.search-song-summary{
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--gold-bright);
+  margin: 4px 2px 14px;
+}
+.empty-state{
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------------
+   [7] STATS TAB
+--------------------------------------------------------------------- */
+.stat-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.stat-tile{
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  padding: 14px 14px 12px;
+}
+.stat-tile__value{
+  font-family: var(--font-display);
+  font-size: 26px;
+  color: var(--gold-bright);
+  line-height: 1.1;
+}
+.stat-tile__label{
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.stat-tile__sub{
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+
+.stats-table-wrap{
+  background: var(--paper);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.stats-table-head{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--paper-alt);
+}
+.stats-table-head h3{
+  font-size: 15px;
+  color: var(--ink);
+}
+.sort-btn{
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: none;
+  border: 1px solid var(--border-paper);
+  border-radius: 999px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.sort-btn:hover{ border-color: var(--rose); color: var(--rose); }
+.stats-table{ width: 100%; border-collapse: collapse; color: var(--ink); }
+.stats-table tbody tr{ border-top: 1px solid var(--border-paper); }
+.stats-table td{ padding: 9px 16px; font-size: 13.5px; }
+.stats-table td:first-child{ font-family: var(--font-mono); color: var(--ink-soft); width: 34px; }
+.stats-table td:last-child{ text-align: right; font-family: var(--font-mono); color: var(--rose); font-weight: 600; }
+.stats-table__bar{
+  height: 4px;
+  background: var(--teal);
+  border-radius: 2px;
+  margin-top: 5px;
+  opacity: .55;
+}
+
+/* ---------------------------------------------------------------------
+   [8] GRAPHICS TAB / SVG CHARTS
+--------------------------------------------------------------------- */
+.chart-card{
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  padding: 18px 16px 14px;
+  margin-bottom: 20px;
+}
+.chart-card h3{
+  font-size: 16px;
+  color: var(--paper);
+  margin-bottom: 2px;
+}
+.chart-card__caption{
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.chart-svg{ width: 100%; height: auto; overflow: visible; }
+.chart-svg text{ font-family: var(--font-mono); fill: var(--text-muted); }
+.chart-legend{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+.chart-legend__item{ display: flex; align-items: center; gap: 6px; }
+.chart-legend__swatch{ width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+.chart-tip{
+  font-size: 11px;
+  fill: var(--ink);
+  font-family: var(--font-mono);
+}
+
+/* ---------------------------------------------------------------------
+   [9] SHARED UI
+--------------------------------------------------------------------- */
+.site-footer{
+  text-align: center;
+  padding: 30px 16px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+  color: var(--text-muted);
+  opacity: .6;
+}
+
+/* ---------------------------------------------------------------------
+   [10] RESPONSIVE + ACCESSIBILITY
+--------------------------------------------------------------------- */
+@media (max-width: 480px){
+  .setlist-grid{ grid-template-columns: 1fr; }
+  .stat-grid{ grid-template-columns: repeat(2, 1fr); }
+  .site-header{ padding-top: 26px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration: 0.001ms !important; animation-duration: 0.001ms !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__eyebrow">Post Millennium Renaissance &middot; Field Guide</div>
+  <h1 class="site-header__title">Grateful Dead <em>1977</em></h1>
+  <div class="site-header__sub">SETLIST ATLAS &middot; 60 SHOWS &middot; FEB&ndash;DEC</div>
+  <div class="site-header__rule"></div>
+</header>
+
+<div class="wrap">
+
+  <nav class="tab-nav" role="tablist" aria-label="Setlist Atlas sections">
+    <button class="tab-btn" role="tab" id="tab-btn-shows" aria-controls="tab-shows" aria-selected="true" data-tab="shows">Shows</button>
+    <button class="tab-btn" role="tab" id="tab-btn-search" aria-controls="tab-search" aria-selected="false" data-tab="search">Search</button>
+    <button class="tab-btn" role="tab" id="tab-btn-stats" aria-controls="tab-stats" aria-selected="false" data-tab="stats">Stats</button>
+    <button class="tab-btn" role="tab" id="tab-btn-graphics" aria-controls="tab-graphics" aria-selected="false" data-tab="graphics">Graphics</button>
+  </nav>
+
+  <!-- ============================ SHOWS TAB ============================ -->
+  <section class="tab-panel is-active" id="tab-shows" role="tabpanel" aria-labelledby="tab-btn-shows">
+    <div class="tour-meta" id="showsTourMeta"></div>
+    <div id="showsList"></div>
+  </section>
+
+  <!-- ============================ SEARCH TAB =========================== -->
+  <section class="tab-panel" id="tab-search" role="tabpanel" aria-labelledby="tab-btn-search">
+    <div class="search-toggle" role="group" aria-label="Search by">
+      <button class="search-toggle__opt" id="modeVenueBtn" aria-pressed="true">Venues &amp; Cities</button>
+      <button class="search-toggle__opt" id="modeSongBtn" aria-pressed="false">Songs</button>
+    </div>
+    <div class="search-input-wrap">
+      <input type="text" class="search-input" id="searchInput" placeholder="Search venues or cities&hellip;" autocomplete="off">
+    </div>
+    <div class="search-hint" id="searchHint">Try &ldquo;Winterland&rdquo;, &ldquo;Chicago&rdquo;, or a state like &ldquo;NY&rdquo;.</div>
+    <div id="searchResults"></div>
+  </section>
+
+  <!-- ============================ STATS TAB ============================ -->
+  <section class="tab-panel" id="tab-stats" role="tabpanel" aria-labelledby="tab-btn-stats">
+    <div class="stat-grid" id="statTiles"></div>
+    <div class="stats-table-wrap">
+      <div class="stats-table-head">
+        <h3>Every song played, ranked</h3>
+        <button class="sort-btn" id="statsSortBtn" data-sort="count">A&ndash;Z</button>
+      </div>
+      <table class="stats-table"><tbody id="statsTableBody"></tbody></table>
+    </div>
+  </section>
+
+  <!-- ============================ GRAPHICS TAB ========================= -->
+  <section class="tab-panel" id="tab-graphics" role="tabpanel" aria-labelledby="tab-btn-graphics">
+    <div class="chart-card">
+      <h3>Most-played songs</h3>
+      <div class="chart-card__caption">Top 15 songs across all 60 shows, by number of performances.</div>
+      <div id="chartBar"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Shows by state</h3>
+      <div class="chart-card__caption">All 26 states and provinces played in 1977, ranked by number of shows.</div>
+      <div id="chartBarState"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Which state had the most shows?</h3>
+      <div class="chart-card__caption">The top 5 states, with the remaining 21 grouped together.</div>
+      <div id="chartPieState"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Set 1, Set 2, or encore?</h3>
+      <div class="chart-card__caption">Every song performance in 1977, grouped by where in the show it fell.</div>
+      <div id="chartPieSlot"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Where the tour played</h3>
+      <div class="chart-card__caption">All 60 shows grouped by region.</div>
+      <div id="chartPieRegion"></div>
+    </div>
+    <div class="chart-card">
+      <h3>Show length across the year</h3>
+      <div class="chart-card__caption">Total songs performed each night (set 1 + set 2 + encore), Feb&ndash;Dec.</div>
+      <div id="chartScatter"></div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site-footer">postmillenniumrenaissance.com &middot; data compiled from publicly available tour archives, cross-checked across multiple sources</footer>
+
+<script>
+/* =====================================================================
+   SECTION 1 — DATA
+   =====================================================================
+   Every show the Grateful Dead played in 1977, in chronological order.
+   Compiled from a Jerry Stratton-lineage setlist database (the same
+   family of research that became DeadBase), and cross-checked against
+   official archive.org show pages, Grateful Dead box-set liner notes,
+   and dead.net, using multiple independent sources per show wherever
+   possible. Sunshine Daydream (Veneta, OR) is NOT in this dataset on
+   purpose — that legendary show was August 27, 1972, not 1977, and
+   gets confused with this tour a lot.
+
+   HOW TO ADD A SHOW LATER
+   ------------------------------------------------------------------
+   1. Copy SHOW_TEMPLATE below, paste it into the SHOWS array in the
+      right chronological spot.
+   2. Fill in id / date / dateDisplay / venue / city / state.
+   3. List songs in performance order in set1 / set2 / encore. Use a
+      SEPARATE array entry per song, even if two songs segue into each
+      other (segues are marked as a property on the song object, see
+      "songSegue" below) — that keeps song-counting in the Stats tab
+      accurate no matter how you format the setlist visually.
+   4. IMPORTANT for stats accuracy: reuse the exact spelling already
+      used elsewhere in this file for any song that repeats (e.g.
+      always "Playing in the Band", never "Playin' in the Band") or
+      it will get counted as a separate song. Search this file for the
+      title first if you're not sure it's already here.
+   5. If you're not 100% sure where a set break or encore falls, add a
+      "flag" string instead of guessing silently — see 1977-11-01 or
+      1977-12-30 below for the pattern. Honesty about confidence beats
+      false precision.
+
+   SONG OBJECT SHAPE
+   ------------------------------------------------------------------
+   Each song is either a plain string "Song Title", OR, if you want to
+   show a segue arrow into the next song, use {t:"Song Title", seg:true}
+   meaning "this song segues into the next one" (renders as "Song Title >").
+   ===================================================================== */
+
+// SHOW_TEMPLATE — copy this to add a new show. Delete before using.
+const SHOW_TEMPLATE = {
+  id: "1977-00-00",              // ISO date; append "-b" if 2 shows same day
+  dateDisplay: "Month D, 1977",  // human-readable date for display
+  venue: "Venue Name",
+  city: "City",
+  state: "ST",                   // 2-letter state/province code, or country
+  country: "USA",                // omit for USA, include for others (e.g. "Canada")
+  set1: ["Song One", "Song Two"],
+  set2: ["Song Three"],
+  encore: [],                    // empty array if no encore
+  notes: "",                     // optional 1-sentence factual note
+  flag: ""                       // optional: note if a set break/encore is inferred
+};
+
+const SHOWS = [
+
+{ id:"1977-02-26", dateDisplay:"Feb 26, 1977", venue:"Swing Auditorium", city:"San Bernardino", state:"CA",
+  set1:["Terrapin Station","New Minglewood Blues","They Love Each Other","Estimated Prophet","Sugaree","Mama Tried","Deal",{t:"Playing in the Band",seg:true},"The Wheel","Playing in the Band"],
+  set2:["Samson and Delilah","Tennessee Jed","The Music Never Stopped","Help on the Way","Slipknot!","Franklin's Tower","Promised Land","Eyes of the World","Dancin' in the Streets","Around and Around"],
+  encore:["U.S. Blues"],
+  notes:"Tour opener, and the live debut of the Terrapin Station-era stage show a few months before that studio album's release." },
+
+{ id:"1977-02-27", dateDisplay:"Feb 27, 1977", venue:"Robertson Gym, UC Santa Barbara", city:"Goleta", state:"CA",
+  set1:["New Minglewood Blues","Loser","El Paso","Ramble On Rose","Estimated Prophet","Peggy-O","Good Lovin'","Mississippi Half-Step Uptown Toodeloo","The Music Never Stopped","Scarlet Begonias"],
+  set2:["Samson and Delilah","St. Stephen","Not Fade Away","Drums","Terrapin Station","Morning Dew","Sugar Magnolia"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-03-18", dateDisplay:"Mar 18, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Promised Land","Mississippi Half-Step Uptown Toodeloo","It's All Over Now","Sugaree","New Minglewood Blues","Peggy-O","Cassidy","Scarlet Begonias","Fire on the Mountain"],
+  set2:["Samson and Delilah","Brown-Eyed Women","Good Lovin'","Ship of Fools","Estimated Prophet","Terrapin Station","The Alhambra","Drums","Not Fade Away","St. Stephen","Around and Around"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-03-19", dateDisplay:"Mar 19, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Bertha","Mama Tried","Loser","Big River","They Love Each Other","Looks Like Rain","Tennessee Jed","Estimated Prophet","Terrapin Station",{t:"Playing in the Band",seg:true},"Samson and Delilah","Playing in the Band"],
+  set2:["Eyes of the World","Dancin' in the Streets","Wharf Rat","Franklin's Tower","Sugar Magnolia"],
+  encore:["One More Saturday Night","Uncle John's Band"] },
+
+{ id:"1977-03-20", dateDisplay:"Mar 20, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["New Minglewood Blues","Ramble On Rose","El Paso","Deal","Cassidy","Peggy-O","Beat It On Down the Line","Brown-Eyed Women","Estimated Prophet","Scarlet Begonias"],
+  set2:["Samson and Delilah","Row Jimmy","Promised Land","St. Stephen","The Other One","Stella Blue","Around and Around"],
+  encore:["U.S. Blues","Terrapin Station"] },
+
+{ id:"1977-04-22", dateDisplay:"Apr 22, 1977", venue:"The Spectrum", city:"Philadelphia", state:"PA",
+  set1:["Promised Land","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Deal","El Paso","Tennessee Jed","Estimated Prophet","Peggy-O","Playing in the Band"],
+  set2:["Scarlet Begonias","Fire on the Mountain","Samson and Delilah","It Must Have Been the Roses","Dancin' in the Streets","Mojo","Dancin' in the Streets","The Wheel","Terrapin Station"],
+  encore:[] },
+
+{ id:"1977-04-23", dateDisplay:"Apr 23, 1977", venue:"Springfield Civic Center", city:"Springfield", state:"MA",
+  set1:["Sugaree","Cassidy","Loser","New Minglewood Blues","Row Jimmy","Me and My Uncle","Ramble On Rose","It's All Over Now","Scarlet Begonias","Fire on the Mountain"],
+  set2:["Estimated Prophet","Bertha","The Music Never Stopped","Help on the Way","Slipknot!","Franklin's Tower","Around and Around","Goin' Down the Road Feelin' Bad","Not Fade Away"],
+  encore:["One More Saturday Night"] },
+
+{ id:"1977-04-25", dateDisplay:"Apr 25, 1977", venue:"Capitol Theatre", city:"Passaic", state:"NJ",
+  set1:["New Minglewood Blues","Deal","Mama Tried","They Love Each Other","Looks Like Rain","Peggy-O",{t:"Lazy Lightning",seg:true},"Supplication","Ship of Fools","El Paso","Brown-Eyed Women","The Music Never Stopped"],
+  set2:["Scarlet Begonias","Fire on the Mountain","Samson and Delilah","Terrapin Station",{t:"Playing in the Band",seg:true},"Drums","Wharf Rat","Playing in the Band"],
+  encore:["U.S. Blues"] },
+
+{ id:"1977-04-26", dateDisplay:"Apr 26, 1977", venue:"Capitol Theatre", city:"Passaic", state:"NJ",
+  set1:["Bertha","Me and My Uncle","It Must Have Been the Roses","Cassidy","Tennessee Jed","Big River","Friend of the Devil","Estimated Prophet","Deal"],
+  set2:["Good Lovin'","Mississippi Half-Step Uptown Toodeloo","Dancin' in the Streets","Eyes of the World","Samson and Delilah","Stella Blue","Sugar Magnolia"],
+  encore:[] },
+
+{ id:"1977-04-27", dateDisplay:"Apr 27, 1977", venue:"Capitol Theatre", city:"Passaic", state:"NJ",
+  set1:["Promised Land","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Sugaree","El Paso","Row Jimmy","New Minglewood Blues","Loser","The Music Never Stopped"],
+  set2:["Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Good Lovin'","Ramble On Rose","Samson and Delilah","Terrapin Station","Morning Dew"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-04-29", dateDisplay:"Apr 29, 1977", venue:"The Palladium", city:"New York", state:"NY",
+  set1:["Help on the Way","Slipknot!","Franklin's Tower","New Minglewood Blues","Tennessee Jed","Cassidy","They Love Each Other","Big River","Loser","The Music Never Stopped"],
+  set2:["Samson and Delilah","Sugaree","El Paso","Brown-Eyed Women","Estimated Prophet","Scarlet Begonias","Goin' Down the Road Feelin' Bad","Drums","The Wheel","Wharf Rat","Around and Around"],
+  encore:["Uncle John's Band"],
+  notes:"First of a five-night stand at the Palladium — the run later remembered for Hells Angels wandering the dressing rooms and John Belushi stopping by." },
+
+{ id:"1977-04-30", dateDisplay:"Apr 30, 1977", venue:"The Palladium", city:"New York", state:"NY",
+  set1:["The Music Never Stopped","Bertha","It's All Over Now","Deal","Mama Tried","Me and My Uncle","Peggy-O","Looks Like Rain","Mississippi Half-Step Uptown Toodeloo","Promised Land"],
+  set2:["Scarlet Begonias","Fire on the Mountain","Good Lovin'","Friend of the Devil","Estimated Prophet","St. Stephen","Not Fade Away","Stella Blue","St. Stephen","One More Saturday Night"],
+  encore:["Terrapin Station"] },
+
+{ id:"1977-05-01", dateDisplay:"May 1, 1977", venue:"The Palladium", city:"New York", state:"NY",
+  set1:["Might as Well","El Paso","Ramble On Rose","Cassidy","They Love Each Other",{t:"Lazy Lightning",seg:true},"Supplication","It Must Have Been the Roses","Estimated Prophet","Tennessee Jed","Sunrise","Samson and Delilah"],
+  set2:["Dancin' in the Streets","Brown-Eyed Women","Playing in the Band","Drums","The Other One","Comes a Time","Playing in the Band"],
+  encore:["Brokedown Palace"] },
+
+{ id:"1977-05-03", dateDisplay:"May 3, 1977", venue:"The Palladium", city:"New York", state:"NY",
+  set1:["Promised Land","Bertha","Me and My Uncle","Peggy-O","Jack Straw","Row Jimmy",{t:"Lazy Lightning",seg:true},"Supplication","Deal","Good Lovin'","Ship of Fools","The Music Never Stopped"],
+  set2:["Might as Well","Estimated Prophet","Sugaree","Samson and Delilah","Friend of the Devil","Eyes of the World","Wharf Rat","Not Fade Away","Around and Around"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-05-04", dateDisplay:"May 4, 1977", venue:"The Palladium", city:"New York", state:"NY",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Big River","They Love Each Other","New Minglewood Blues","It Must Have Been the Roses","Cassidy","Deal","Looks Like Rain","Brown-Eyed Women","Dancin' in the Streets"],
+  set2:["Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Terrapin Station","Playing in the Band","Comes a Time","Playing in the Band"],
+  encore:[] },
+
+{ id:"1977-05-05", dateDisplay:"May 5, 1977", venue:"Veterans' Memorial Coliseum", city:"New Haven", state:"CT",
+  set1:["Promised Land","Sugaree","Mama Tried","El Paso","Tennessee Jed","Looks Like Rain","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Peggy-O","The Music Never Stopped"],
+  set2:["Bertha","Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Good Lovin'","St. Stephen","Sugar Magnolia"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-05-07", dateDisplay:"May 7, 1977", venue:"Boston Garden", city:"Boston", state:"MA",
+  set1:["Bertha","Cassidy","Deal","Jack Straw","Peggy-O","New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Big River","Tennessee Jed","The Music Never Stopped"],
+  set2:["Terrapin Station","Samson and Delilah","Friend of the Devil","Estimated Prophet","Eyes of the World","Drums","The Wheel","Wharf Rat","Around and Around"],
+  encore:["U.S. Blues"] },
+
+{ id:"1977-05-08", dateDisplay:"May 8, 1977", venue:"Barton Hall, Cornell University", city:"Ithaca", state:"NY",
+  set1:["New Minglewood Blues","Loser","El Paso","They Love Each Other","Jack Straw","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Brown-Eyed Women","Mama Tried","Row Jimmy","Dancin' in the Streets"],
+  set2:[{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Estimated Prophet",{t:"St. Stephen",seg:true},{t:"Not Fade Away",seg:true},{t:"St. Stephen",seg:true},"Morning Dew"],
+  encore:["One More Saturday Night"],
+  notes:"Cornell '77 — probably the single most famous Grateful Dead recording in circulation. Added to the Library of Congress National Recording Registry in 2011; fans queued outside Barton Hall as sleet moved in that afternoon." },
+
+{ id:"1977-05-09", dateDisplay:"May 9, 1977", venue:"War Memorial Auditorium", city:"Buffalo", state:"NY",
+  set1:["Help on the Way","Slipknot!","Franklin's Tower","Cassidy","Brown-Eyed Women","Mexicali Blues","Tennessee Jed","Big River","Peggy-O","Sunrise","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","Ship of Fools","Estimated Prophet","The Other One","Drums","Not Fade Away","Comes a Time","Sugar Magnolia"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-05-11", dateDisplay:"May 11, 1977", venue:"St. Paul Civic Center", city:"St. Paul", state:"MN",
+  set1:["Promised Land","They Love Each Other","Big River","Loser","Looks Like Rain","Ramble On Rose","Jack Straw","Peggy-O","El Paso","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Sugaree"],
+  set2:["Samson and Delilah","Brown-Eyed Women","Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Good Lovin'","Uncle John's Band","Wharf Rat","Around and Around"],
+  encore:["Brokedown Palace"] },
+
+{ id:"1977-05-12", dateDisplay:"May 12, 1977", venue:"Auditorium Theatre", city:"Chicago", state:"IL",
+  set1:["Bertha","Me and My Uncle","Tennessee Jed","Cassidy","Peggy-O","Jack Straw","They Love Each Other","New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Dancin' in the Streets"],
+  set2:["Samson and Delilah","Brown-Eyed Women","Estimated Prophet","Sunrise","Terrapin Station","Playing in the Band","Drums","Not Fade Away","Comes a Time","Playing in the Band"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-05-13", dateDisplay:"May 13, 1977", venue:"Auditorium Theatre", city:"Chicago", state:"IL",
+  set1:["The Music Never Stopped","Ramble On Rose","Cassidy","Brown-Eyed Women","New Minglewood Blues","Friend of the Devil","El Paso","Jack-a-Roe","Looks Like Rain",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain"],
+  set2:["Samson and Delilah","Bertha","Estimated Prophet","Drums","The Other One","Stella Blue","Goin' Down the Road Feelin' Bad","One More Saturday Night"],
+  encore:["U.S. Blues"] },
+
+{ id:"1977-05-15", dateDisplay:"May 15, 1977", venue:"St. Louis Arena", city:"St. Louis", state:"MO",
+  set1:["Bertha","Good Lovin'","Row Jimmy","New Minglewood Blues","Tennessee Jed",{t:"Lazy Lightning",seg:true},"Supplication","Jack-a-Roe","Passenger","Funicul\u00ec Funicul\u00e0","Brown-Eyed Women","Dancin' in the Streets"],
+  set2:["Estimated Prophet","Eyes of the World","Drums","Samson and Delilah","Ship of Fools","St. Stephen","Iko Iko","Not Fade Away","Sugar Magnolia"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-05-17", dateDisplay:"May 17, 1977", venue:"Memorial Coliseum, University of Alabama", city:"Tuscaloosa", state:"AL",
+  set1:["New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","El Paso","They Love Each Other","Jack Straw","Jack-a-Roe","Looks Like Rain","Tennessee Jed","Passenger","High Time","Big River","Sunrise","Scarlet Begonias","Fire on the Mountain"],
+  set2:["Samson and Delilah","Bertha","Good Lovin'","Brown-Eyed Women","Estimated Prophet","Terrapin Station","Playing in the Band","Drums","Wharf Rat","Playing in the Band"],
+  encore:["Sugar Magnolia"] },
+
+{ id:"1977-05-18", dateDisplay:"May 18, 1977", venue:"Fox Theatre", city:"Atlanta", state:"GA",
+  set1:["Deal","Cassidy","Jack-a-Roe","Mexicali Blues","Friend of the Devil","New Minglewood Blues","It Must Have Been the Roses",{t:"Lazy Lightning",seg:true},"Supplication","High Time","The Music Never Stopped"],
+  set2:["Jack Straw","Ship of Fools","Estimated Prophet","Eyes of the World","Drums","The Other One","Stella Blue","Around and Around"],
+  encore:["Brokedown Palace"] },
+
+{ id:"1977-05-19", dateDisplay:"May 19, 1977", venue:"Fox Theatre", city:"Atlanta", state:"GA",
+  set1:["Promised Land",{t:"Sugaree",seg:true},"El Paso","Peggy-O","Looks Like Rain","Row Jimmy","Passenger","Loser","Dancin' in the Streets"],
+  set2:["Samson and Delilah","Ramble On Rose","Estimated Prophet",{t:"Terrapin Station",seg:true},{t:"Playing in the Band",seg:true},{t:"Uncle John's Band",seg:true},{t:"Drums",seg:true},{t:"The Wheel",seg:true},{t:"China Doll",seg:true},"Playing in the Band"],
+  encore:[],
+  notes:"Officially released as Dick's Picks Vol. 29, paired with the Lakeland show two nights later." },
+
+{ id:"1977-05-21", dateDisplay:"May 21, 1977", venue:"Lakeland Civic Center", city:"Lakeland", state:"FL",
+  set1:["Bertha","Me and My Uncle","They Love Each Other","Cassidy","Jack-a-Roe","Jack Straw","Tennessee Jed","New Minglewood Blues","Row Jimmy","Passenger",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain"],
+  set2:["Samson and Delilah","Brown-Eyed Women","Estimated Prophet","He's Gone","Drums","The Other One","Comes a Time","St. Stephen","Not Fade Away","St. Stephen","One More Saturday Night"],
+  encore:["U.S. Blues"],
+  notes:"Officially released as Dick's Picks Vol. 29, paired with the Atlanta show two nights before." },
+
+{ id:"1977-05-22", dateDisplay:"May 22, 1977", venue:"The Sportatorium", city:"Hollywood", state:"FL",
+  set1:["The Music Never Stopped","Sugaree","El Paso","Peggy-O","New Minglewood Blues","Friend of the Devil",{t:"Lazy Lightning",seg:true},"Supplication","Ramble On Rose","Dancin' in the Streets"],
+  set2:["Help on the Way","Slipknot!","Franklin's Tower","Samson and Delilah","Brown-Eyed Women","Good Lovin'","Sunrise","Estimated Prophet","Eyes of the World","Wharf Rat","Terrapin Station","Morning Dew"],
+  encore:["Sugar Magnolia"],
+  notes:"Officially released as Dick's Picks Vol. 3 \u2014 the show most people mean when they say \u201cDick's Picks Three,\u201d sometimes misremembered as the Lakeland date the night before." },
+
+{ id:"1977-05-25", dateDisplay:"May 25, 1977", venue:"The Mosque", city:"Richmond", state:"VA",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","They Love Each Other","Mexicali Blues","Peggy-O","Cassidy","Loser",{t:"Lazy Lightning",seg:true},"Supplication","Brown-Eyed Women","Promised Land"],
+  set2:["Scarlet Begonias","Fire on the Mountain","Estimated Prophet","He's Gone","Drums","The Other One","Wharf Rat","The Other One","The Wheel","Around and Around"],
+  encore:["U.S. Blues"],
+  notes:"Officially released as Dave's Picks Vol. 1, the very first release in that series." },
+
+{ id:"1977-05-26", dateDisplay:"May 26, 1977", venue:"Baltimore Civic Center", city:"Baltimore", state:"MD",
+  set1:["The Music Never Stopped","Sugaree","Mama Tried","Sunrise","Deal","Passenger","Brown-Eyed Women","Looks Like Rain","Jack-a-Roe","New Minglewood Blues","Bertha"],
+  set2:["Samson and Delilah","High Time","Big River","Terrapin Station","Estimated Prophet","Eyes of the World","Not Fade Away","Goin' Down the Road Feelin' Bad","Around and Around"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-05-28", dateDisplay:"May 28, 1977", venue:"Hartford Civic Center", city:"Hartford", state:"CT",
+  set1:["Bertha","Good Lovin'","Sugaree","Jack Straw","Row Jimmy","New Minglewood Blues","Candyman","Passenger","Brown-Eyed Women","Promised Land"],
+  set2:["Samson and Delilah","Tennessee Jed","Estimated Prophet","Playing in the Band","Terrapin Station","Not Fade Away","Wharf Rat","Playing in the Band","One More Saturday Night"],
+  encore:["U.S. Blues"],
+  notes:"Closing night of the band's 26-date spring East Coast tour. Officially released as To Terrapin: Hartford '77." },
+
+{ id:"1977-06-04", dateDisplay:"Jun 4, 1977", venue:"The Fabulous Forum", city:"Inglewood", state:"CA",
+  set1:["Promised Land","Tennessee Jed","El Paso","Peggy-O","Jack Straw","Friend of the Devil",{t:"Lazy Lightning",seg:true},"Supplication","Candyman","New Minglewood Blues","Brown-Eyed Women","The Music Never Stopped"],
+  set2:["Samson and Delilah","Ship of Fools","Estimated Prophet","Eyes of the World","Drums","Good Lovin'","Terrapin Station","Playing in the Band","Franklin's Tower","China Doll","Not Fade Away","Playing in the Band"],
+  encore:["One More Saturday Night"] },
+
+{ id:"1977-06-07", dateDisplay:"Jun 7, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Bertha","Jack Straw","Tennessee Jed","Looks Like Rain","Peggy-O","Funicul\u00ec Funicul\u00e0","El Paso","Friend of the Devil","The Music Never Stopped"],
+  set2:[{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Good Lovin'","Candyman","Estimated Prophet","He's Gone","Drums","Samson and Delilah","Terrapin Station","Morning Dew","Around and Around","Uncle John's Band"],
+  encore:["U.S. Blues"],
+  notes:"First of a three-night Winterland homecoming stand, later released in full as Winterland June 1977: The Complete Recordings." },
+
+{ id:"1977-06-08", dateDisplay:"Jun 8, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["New Minglewood Blues","Sugaree","Mexicali Blues","Row Jimmy","Passenger","Sunrise","Brown-Eyed Women","It's All Over Now","Jack-a-Roe",{t:"Lazy Lightning",seg:true},"Supplication"],
+  set2:["Bertha","Good Lovin'","Ramble On Rose","Estimated Prophet","Eyes of the World","Drums","The Other One","Wharf Rat","Not Fade Away","Goin' Down the Road Feelin' Bad","Johnny B. Goode"],
+  encore:["Brokedown Palace"] },
+
+{ id:"1977-06-09", dateDisplay:"Jun 9, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","They Love Each Other","Cassidy","Sunrise","Deal","Looks Like Rain","Loser","The Music Never Stopped"],
+  set2:["Samson and Delilah","Funicul\u00ec Funicul\u00e0","Help on the Way","Slipknot!","Franklin's Tower","Estimated Prophet","St. Stephen","Not Fade Away","Drums","St. Stephen","Terrapin Station","Sugar Magnolia"],
+  encore:["U.S. Blues","One More Saturday Night"],
+  notes:"Closes the spring/summer leg — the band didn't tour again until Englishtown in September." },
+
+{ id:"1977-09-03", dateDisplay:"Sep 3, 1977", venue:"Raceway Park", city:"Englishtown", state:"NJ",
+  set1:["Promised Land","They Love Each Other","Me and My Uncle","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Peggy-O","New Minglewood Blues","Friend of the Devil","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","Loser","Estimated Prophet","Eyes of the World","Samson and Delilah","He's Gone","Not Fade Away","Truckin'"],
+  encore:["Terrapin Station"],
+  notes:"Attendance of 107,019 — for decades the largest ticketed concert by a single act in U.S. history. New Riders of the Purple Sage and the Marshall Tucker Band opened." },
+
+{ id:"1977-09-28", dateDisplay:"Sep 28, 1977", venue:"Paramount Theatre", city:"Seattle", state:"WA",
+  set1:["New Minglewood Blues","They Love Each Other","Cassidy","Loser","Jack Straw","Tennessee Jed","Passenger","Peggy-O","Me and My Uncle","Friend of the Devil","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","Dire Wolf","Estimated Prophet","Eyes of the World","Drums","Not Fade Away","Wharf Rat","Around and Around"],
+  encore:["U.S. Blues"],
+  notes:"Opens the fall tour: a Pacific Northwest and Southwest run followed by a swing back east through the Midwest." },
+
+{ id:"1977-09-29", dateDisplay:"Sep 29, 1977", venue:"Paramount Theatre", city:"Seattle", state:"WA",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Mama Tried","Deal","Looks Like Rain","Ramble On Rose","El Paso","Sugaree","Let It Grow","Franklin's Tower"],
+  set2:["Samson and Delilah","Ship of Fools","Estimated Prophet","He's Gone","Drums","Truckin'","Stella Blue","Goin' Down the Road Feelin' Bad","Johnny B. Goode"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-10-01", dateDisplay:"Oct 1, 1977", venue:"Paramount Theatre", city:"Portland", state:"OR",
+  set1:["Promised Land","They Love Each Other","Mexicali Blues","Dire Wolf","Cassidy","Deal","Passenger","Tennessee Jed","New Minglewood Blues","Peggy-O","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","It Must Have Been the Roses","Estimated Prophet","Eyes of the World","Dancin' in the Streets","Drums","Not Fade Away","Black Peter","Around and Around"],
+  encore:[] },
+
+{ id:"1977-10-02", dateDisplay:"Oct 2, 1977", venue:"Paramount Theatre", city:"Portland", state:"OR",
+  set1:["Casey Jones","Jack Straw","Sunrise","Brown-Eyed Women","El Paso","Dupree's Diamond Blues","Let It Grow","Deal"],
+  set2:["Samson and Delilah","Scarlet Begonias","Fire on the Mountain","Funicul\u00ec Funicul\u00e0","Playing in the Band","Drums","The Wheel","Truckin'","The Other One","Wharf Rat","Sugar Magnolia"],
+  encore:["Johnny B. Goode"],
+  notes:"Both Portland nights were released together as Dave's Picks Vol. 45 — the return of \u201cCasey Jones\u201d and \u201cDupree's Diamond Blues\u201d to the repertoire after a long absence." },
+
+{ id:"1977-10-06", dateDisplay:"Oct 6, 1977", venue:"Arizona State University Activity Center", city:"Tempe", state:"AZ",
+  set1:["Promised Land","Tennessee Jed","Jack Straw","Dire Wolf","Looks Like Rain","Loser","New Minglewood Blues","They Love Each Other","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","Friend of the Devil","Estimated Prophet","Eyes of the World","Drums","Not Fade Away","Black Peter","Not Fade Away","Around and Around"],
+  encore:["Uncle John's Band"] },
+
+{ id:"1977-10-07", dateDisplay:"Oct 7, 1977", venue:"University Arena, University of New Mexico", city:"Albuquerque", state:"NM",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","Peggy-O","El Paso","They Love Each Other","Big River","Dupree's Diamond Blues","Let It Grow","Deal"],
+  set2:["Samson and Delilah","Sunrise","Ramble On Rose","Passenger","Terrapin Station","Playing in the Band","Drums","Iko Iko","The Wheel","Wharf Rat","Sugar Magnolia"],
+  encore:["One More Saturday Night"] },
+
+{ id:"1977-10-09", dateDisplay:"Oct 9, 1977", venue:"McNichols Sports Arena", city:"Denver", state:"CO",
+  set1:["Promised Land","They Love Each Other","Cassidy","Dire Wolf","Looks Like Rain","Brown-Eyed Women","Lazy Lightning","Supplication","Sugaree","The Music Never Stopped"],
+  set2:["Samson and Delilah","Scarlet Begonias","Fire on the Mountain","Estimated Prophet","He's Gone","Truckin'","Drums","Terrapin Station","Around and Around"],
+  encore:["Casey Jones"] },
+
+{ id:"1977-10-11", dateDisplay:"Oct 11, 1977", venue:"Lloyd Noble Center, University of Oklahoma", city:"Norman", state:"OK",
+  set1:["Help on the Way","Slipknot!","Franklin's Tower","Jack Straw","Peggy-O","El Paso","Sunrise","Deal","Let It Grow"],
+  set2:["Dancin' in the Streets","Dire Wolf","Estimated Prophet","Eyes of the World","Not Fade Away","Wharf Rat","Around and Around"],
+  encore:[] },
+
+{ id:"1977-10-12", dateDisplay:"Oct 12, 1977", venue:"Manor Downs", city:"Austin", state:"TX",
+  set1:["Promised Land","They Love Each Other","Me and My Uncle","Candyman","Passenger","Brown-Eyed Women","El Paso","Friend of the Devil","Lazy Lightning","Supplication","Deal"],
+  set2:["Samson and Delilah","Tennessee Jed","Estimated Prophet","He's Gone","Drums","The Other One","Black Peter","Truckin'","Nobody's Fault But Mine","Iko Iko","Sugar Magnolia"],
+  encore:["Johnny B. Goode"],
+  notes:"Played on the infield of a horse-racing track outside Austin, on a night cold enough that Weir joked the band couldn't feel their fingers." },
+
+{ id:"1977-10-14", dateDisplay:"Oct 14, 1977", venue:"Hofheinz Pavilion", city:"Houston", state:"TX",
+  set1:["Jack Straw","Mississippi Half-Step Uptown Toodeloo","El Paso","Brown-Eyed Women","New Minglewood Blues","Loser","Passenger","Friend of the Devil","Me and My Uncle","Tennessee Jed","The Music Never Stopped"],
+  set2:["Bertha","Good Lovin'","Candyman","Playing in the Band","Drums","The Wheel","Wharf Rat","Around and Around"],
+  encore:["Brokedown Palace","Playing in the Band"] },
+
+{ id:"1977-10-15", dateDisplay:"Oct 15, 1977", venue:"Moody Coliseum, Southern Methodist University", city:"Dallas", state:"TX",
+  set1:["Bertha","Good Lovin'","They Love Each Other","Mama Tried","Big River","Ramble On Rose","Looks Like Rain","Peggy-O","Let It Grow"],
+  set2:["Samson and Delilah","Sunrise","Terrapin Station","St. Stephen","Not Fade Away","Stella Blue","Sugar Magnolia"],
+  encore:["Truckin'","One More Saturday Night"] },
+
+{ id:"1977-10-16", dateDisplay:"Oct 16, 1977", venue:"LSU Assembly Center", city:"Baton Rouge", state:"LA",
+  set1:["Promised Land","Sugaree","Cassidy","Loser","New Minglewood Blues","Friend of the Devil","Sunrise","Dire Wolf","The Music Never Stopped"],
+  set2:[{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Estimated Prophet","Drums","The Other One","Good Lovin'","Terrapin Station","Black Peter","Around and Around"],
+  encore:["U.S. Blues"],
+  notes:"Bob Weir's 30th birthday, and the last of five straight Southern tour stops before a two-week break." },
+
+{ id:"1977-10-28", dateDisplay:"Oct 28, 1977", venue:"Soldiers' and Sailors' Memorial Hall", city:"Kansas City", state:"KS",
+  set1:["Promised Land","They Love Each Other","Cassidy","Tennessee Jed","Mexicali Blues","Big River","Brown-Eyed Women","Lazy Lightning","Supplication","Deal"],
+  set2:["Samson and Delilah","Candyman","Sunrise","Passenger","He's Gone","Drums","Not Fade Away","Stella Blue","Goin' Down the Road Feelin' Bad","Around and Around"],
+  encore:["Casey Jones"],
+  flag:"Encore inferred as the closing song of the night; the source used didn't mark an explicit set/encore break." },
+
+{ id:"1977-10-29", dateDisplay:"Oct 29, 1977", venue:"Chick Evans Field House, Northern Illinois University", city:"De Kalb", state:"IL",
+  set1:["Might as Well","Jack Straw","Dire Wolf","Looks Like Rain","Loser","El Paso","Ramble On Rose","New Minglewood Blues","It Must Have Been the Roses","Let It Grow"],
+  set2:["Bertha","Good Lovin'","Friend of the Devil","Estimated Prophet","Eyes of the World","St. Stephen","Not Fade Away","Black Peter","Sugar Magnolia","Drums","Sunshine Daydream"],
+  encore:["One More Saturday Night"] },
+
+{ id:"1977-10-30", dateDisplay:"Oct 30, 1977", venue:"Assembly Hall, Indiana University", city:"Bloomington", state:"IN",
+  set1:["New Minglewood Blues","They Love Each Other","Mama Tried","Me and My Uncle","Tennessee Jed","Passenger","Candyman","Lazy Lightning","Supplication","Deal"],
+  set2:["Samson and Delilah","Peggy-O","Playing in the Band","The Other One","Drums","The Wheel","Wharf Rat","Playing in the Band"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-11-01", dateDisplay:"Nov 1, 1977", venue:"Cobo Arena", city:"Detroit", state:"MI",
+  set1:["Might as Well","Jack Straw","Tennessee Jed","El Paso","Friend of the Devil","Looks Like Rain","Dire Wolf","Passenger","Peggy-O","The Music Never Stopped"],
+  set2:["Terrapin Station","Estimated Prophet","The Other One","Drums","Wharf Rat","Truckin'","Around and Around"],
+  encore:["U.S. Blues"],
+  flag:"Set break placed at a documented tuning pause between The Music Never Stopped and Terrapin Station; not explicitly labeled \u201cSet 1 / Set 2\u201d in the source." },
+
+{ id:"1977-11-02", dateDisplay:"Nov 2, 1977", venue:"Field House, Seneca College", city:"Toronto", state:"ON", country:"Canada",
+  set1:["Promised Land","They Love Each Other",{t:"Me and My Uncle",seg:true},"Big River","Candyman","Looks Like Rain","Ramble On Rose",{t:"Lazy Lightning",seg:true},"Supplication","Might as Well"],
+  set2:["Samson and Delilah","Ship of Fools","Good Lovin'","Sunrise",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain",{t:"Estimated Prophet",seg:true},{t:"St. Stephen",seg:true},{t:"Truckin'",seg:true},"Around and Around"],
+  encore:["Terrapin Station"] },
+
+{ id:"1977-11-04", dateDisplay:"Nov 4, 1977", venue:"Cotterell Gym, Colgate University", city:"Hamilton", state:"NY",
+  set1:[{t:"Bertha",seg:true},"Good Lovin'","Brown-Eyed Women","Cassidy","It Must Have Been the Roses","Sunrise","New Minglewood Blues","Dupree's Diamond Blues","Let It Grow"],
+  set2:[{t:"Samson and Delilah",seg:true},"Cold Rain and Snow",{t:"Playing in the Band",seg:true},{t:"Eyes of the World",seg:true},{t:"Estimated Prophet",seg:true},{t:"The Other One",seg:true},{t:"Drums",seg:true},{t:"Iko Iko",seg:true},{t:"Stella Blue",seg:true},"Playing in the Band"],
+  encore:["Johnny B. Goode"] },
+
+{ id:"1977-11-05", dateDisplay:"Nov 5, 1977", venue:"Community War Memorial", city:"Rochester", state:"NY",
+  set1:["New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Dire Wolf",{t:"Mama Tried",seg:true},"Big River","Candyman","Jack Straw","Deal"],
+  set2:[{t:"Jam",seg:true},{t:"Eyes of the World",seg:true},"Samson and Delilah","It Must Have Been the Roses",{t:"Estimated Prophet",seg:true},{t:"He's Gone",seg:true},{t:"Drums",seg:true},{t:"The Other One",seg:true},{t:"Black Peter",seg:true},"Sugar Magnolia"],
+  encore:["One More Saturday Night"],
+  notes:"Officially released as Dick's Picks Vol. 34, paired with bonus material from the Toronto show three nights earlier." },
+
+{ id:"1977-11-06", dateDisplay:"Nov 6, 1977", venue:"Broome County Veterans Memorial Arena", city:"Binghamton", state:"NY",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","Tennessee Jed","Mexicali Blues","Me and My Uncle","Friend of the Devil","New Minglewood Blues","Dupree's Diamond Blues","Passenger","Dire Wolf","The Music Never Stopped"],
+  set2:["Samson and Delilah","Sunrise",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Good Lovin'",{t:"St. Stephen",seg:true},{t:"Drums",seg:true},{t:"Not Fade Away",seg:true},{t:"Wharf Rat",seg:true},{t:"St. Stephen",seg:true},"Truckin'"],
+  encore:[],
+  notes:"Officially released as Dave's Picks Vol. 25; often ranked among the best-played shows of the whole tour.",
+  flag:"No encore is documented in the sources used for this show — it may simply not have had one." },
+
+{ id:"1977-12-27", dateDisplay:"Dec 27, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:[{t:"Bertha",seg:true},"Good Lovin'","Brown-Eyed Women","Cassidy","Peggy-O","Looks Like Rain","Dire Wolf","Passenger","Candyman","El Paso","Friend of the Devil","The Music Never Stopped"],
+  set2:["Cold Rain and Snow","Lazy Lightning","Supplication",{t:"Scarlet Begonias",seg:true},{t:"Fire on the Mountain",seg:true},{t:"Estimated Prophet",seg:true},{t:"He's Gone",seg:true},{t:"Truckin'",seg:true},{t:"Wharf Rat",seg:true},"Around and Around"],
+  encore:["Samson and Delilah"],
+  notes:"Opens a four-night year-end Winterland run that closes out the tour." },
+
+{ id:"1977-12-29", dateDisplay:"Dec 29, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Jack Straw","They Love Each Other","Mama Tried","Loser","Looks Like Rain","Tennessee Jed","New Minglewood Blues","Sugaree","Promised Land"],
+  set2:[{t:"Bertha",seg:true},"Good Lovin'","It Must Have Been the Roses","Sunrise",{t:"Playing in the Band",seg:true},{t:"China Cat Sunflower",seg:true},{t:"I Know You Rider",seg:true},{t:"China Doll",seg:true},{t:"Playing in the Band",seg:true},{t:"Drums",seg:true},{t:"Not Fade Away",seg:true},"Playing in the Band"],
+  encore:["Terrapin Station","Johnny B. Goode"],
+  notes:"Officially released as Dick's Picks Vol. 10, with bonus tracks from the following night." },
+
+{ id:"1977-12-30", dateDisplay:"Dec 30, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["Mississippi Half-Step Uptown Toodeloo","Me and My Uncle","Dire Wolf","Looks Like Rain","Row Jimmy","Big River","Peggy-O","Passenger","Ramble On Rose","Let It Grow"],
+  set2:["Samson and Delilah","Ship of Fools","Estimated Prophet","Eyes of the World","St. Stephen","Sugar Magnolia","Good Lovin'"],
+  encore:["U.S. Blues"],
+  flag:"The boundary between the end of Set 2 and the encore (\u201cGood Lovin'\u201d / \u201cU.S. Blues\u201d) is inferred from typical show shape, not an explicit source label." },
+
+{ id:"1977-12-31", dateDisplay:"Dec 31, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
+  set1:["The Music Never Stopped","Tennessee Jed","Funicul\u00ec Funicul\u00e0","Me and My Uncle","Loser","Jack Straw","Friend of the Devil","Lazy Lightning","Supplication"],
+  set2:["Sugar Magnolia","Scarlet Begonias","Fire on the Mountain","Truckin'","Wharf Rat","Drums","Not Fade Away","Around and Around"],
+  encore:["One More Saturday Night","Casey Jones"],
+  notes:"New Year's Eve — closes out the tour and the year. New Riders of the Purple Sage opened, and promoter Bill Graham made his traditional entrance flying over the crowd, this year on a motorcycle." }
+
+]; // end SHOWS
+
+/* Two 1977 tour legs, used for the section dividers on the Shows tab. */
+const TOUR_LEGS = [
+  { through: "1977-06-09", label: "Spring &amp; Early Summer &middot; Feb\u2013Jun" },
+  { through: "1977-09-03", label: "Englishtown \u2014 Standalone Show" },
+  { through: "1977-10-16", label: "Fall Tour, Part 1 &middot; Pacific NW, Southwest &amp; South" },
+  { through: "1977-11-06", label: "Fall Tour, Part 2 &middot; Midwest &amp; Northeast" },
+  { through: "1977-12-31", label: "Year-End Run &middot; Winterland" }
+];
+
+/* Hex twins of the CSS custom properties in [1] THEME BOOTSTRAP, kept in
+   sync by hand. Used by the SVG chart builders below, which write plain
+   attribute strings rather than CSS var() references — this sidesteps
+   any inconsistency in how var() resolves inside SVG presentation
+   attributes across older renderers. If you change a color in the CSS
+   :root block, mirror the change here too. */
+const THEME = {
+  gold: "#DFA43D", goldBright: "#F0BE5E", rose: "#C24B3F",
+  teal: "#4C9088", plum: "#8C6BA6", ink: "#211C30",
+  paper: "#F1E6C9", textMuted: "#A79BC4", bgPanel: "#2A2444"
+};
+
+/* =====================================================================
+   SECTION 2 — UTILITIES
+   Small, pure, reusable helpers. Nothing here touches the DOM.
+   ===================================================================== */
+
+// A song entry is either a plain string, or {t, seg:true} for a segue.
+function songText(entry){ return typeof entry === "string" ? entry : entry.t; }
+function songSegues(entry){ return typeof entry === "object" && entry.seg === true; }
+
+// Flattens every show into one performance per song, tagged with which
+// set it fell in and which show it belongs to. This is the single
+// source of truth the Stats tab and Graphics tab both build on, so
+// adding a show to SHOWS automatically flows through to both.
+function allPerformances(shows){
+  const out = [];
+  shows.forEach(show=>{
+    ["set1","set2","encore"].forEach(setName=>{
+      show[setName].forEach(entry=>{
+        out.push({ song: songText(entry), show, setName });
+      });
+    });
+  });
+  return out;
+}
+
+function songCounts(shows){
+  const counts = new Map();
+  allPerformances(shows).forEach(p=>{
+    counts.set(p.song, (counts.get(p.song) || 0) + 1);
+  });
+  return counts;
+}
+
+function totalSongsInShow(show){
+  return show.set1.length + show.set2.length + show.encore.length;
+}
+
+function showMatchesVenueQuery(show, q){
+  q = q.toLowerCase();
+  return show.venue.toLowerCase().includes(q)
+    || show.city.toLowerCase().includes(q)
+    || show.state.toLowerCase().includes(q)
+    || (show.country || "").toLowerCase().includes(q)
+    || show.dateDisplay.toLowerCase().includes(q);
+}
+
+function showMatchesSongQuery(show, q){
+  q = q.toLowerCase();
+  return [...show.set1, ...show.set2, ...show.encore]
+    .some(e => songText(e).toLowerCase().includes(q));
+}
+
+// Groups shows into five broad touring regions for the region pie chart.
+// This is presentational grouping only — the underlying show.state is
+// always the source of truth, this just buckets it for the chart.
+function regionForState(state, country){
+  if (country === "Canada") return "Canada";
+  const west      = ["CA","OR","WA","AZ","NM","CO"];
+  const south     = ["TX","LA","AL","GA","FL","OK"];
+  const midwest   = ["IL","MO","MN","IN","MI","KS"];
+  const northeast = ["NY","NJ","MA","PA","CT","MD","VA"];
+  if (west.includes(state))      return "West";
+  if (south.includes(state))     return "South";
+  if (midwest.includes(state))   return "Midwest";
+  if (northeast.includes(state)) return "Northeast";
+  return "Other";
+}
+
+// Tallies shows per state/province, sorted most-to-fewest. Canada's
+// single province (ON) is left as its own row rather than merged into
+// a US state, since it isn't one.
+function showCountsByState(shows){
+  const counts = new Map();
+  shows.forEach(s=>{
+    counts.set(s.state, (counts.get(s.state) || 0) + 1);
+  });
+  return [...counts.entries()].sort((a,b)=> b[1] - a[1]);
+}
+
+function legIndexForShow(show){
+  for (let i = 0; i < TOUR_LEGS.length; i++){
+    if (show.id <= TOUR_LEGS[i].through) return i;
+  }
+  return TOUR_LEGS.length - 1;
+}
+
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, c => (
+    { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]
+  ));
+}
+
+function truncate(str, n){
+  return str.length > n ? str.slice(0, n - 1) + "\u2026" : str;
+}
+
+// Wraps every case-insensitive match of `query` inside `text` in a
+// <span class="song-hit">, for the Songs search mode. Falls back to a
+// plain escaped string when there's no match (shouldn't normally
+// happen, since callers only highlight rows that already matched).
+function highlightSong(text, query){
+  if (!query) return escapeHtml(text);
+  const idx = text.toLowerCase().indexOf(query.toLowerCase());
+  if (idx === -1) return escapeHtml(text);
+  const before = escapeHtml(text.slice(0, idx));
+  const match  = escapeHtml(text.slice(idx, idx + query.length));
+  const after  = escapeHtml(text.slice(idx + query.length));
+  return `${before}<span class="song-hit">${match}</span>${after}`;
+}
+
+/* =====================================================================
+   SECTION 3 — SHOW CARD RENDERING
+   Shared by both the Shows tab and Search tab, so a show only has one
+   markup template to maintain.
+   ===================================================================== */
+
+const openShowIds = new Set();
+
+function renderSongList(entries, highlightQuery){
+  return entries.map(entry=>{
+    const text = songText(entry);
+    const seg = songSegues(entry);
+    const display = highlightQuery ? highlightSong(text, highlightQuery) : escapeHtml(text);
+    return `<li class="${seg ? "is-segue" : ""}">${display}${seg ? '<span class="segue-arrow">&gt;</span>' : ""}</li>`;
+  }).join("");
+}
+
+function renderShowCard(show, opts){
+  opts = opts || {};
+  const isOpen = openShowIds.has(show.id);
+  const place = show.country
+    ? `${show.city}, ${show.state}, ${show.country}`
+    : `${show.city}, ${show.state}`;
+
+  const flagHtml = show.flag
+    ? `<div class="show-card__flag">Note on this setlist: ${escapeHtml(show.flag)}</div>`
+    : "";
+  const noteHtml = show.notes
+    ? `<div class="show-card__note">${escapeHtml(show.notes)}</div>`
+    : "";
+  const encoreHtml = show.encore.length
+    ? `<ul class="setlist-songs">${renderSongList(show.encore, opts.highlightQuery)}</ul>`
+    : `<div class="no-encore">No encore documented for this show.</div>`;
+
+  return `
+  <div class="show-card" data-open="${isOpen}" data-show-id="${show.id}">
+    <button class="show-card__header" aria-expanded="${isOpen}" type="button">
+      <span class="show-card__date">${show.dateDisplay}</span>
+      <span class="show-card__body">
+        <span class="show-card__venue">${escapeHtml(show.venue)}</span>
+        <span class="show-card__place">${escapeHtml(place)}</span>
+      </span>
+      <svg class="show-card__chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+    <div class="show-card__setlist">
+      ${flagHtml}${noteHtml}
+      <div class="setlist-grid">
+        <div class="setlist-col">
+          <div class="setlist-col-title">Set One</div>
+          <ul class="setlist-songs">${renderSongList(show.set1, opts.highlightQuery)}</ul>
+        </div>
+        <div class="setlist-col">
+          <div class="setlist-col-title">Set Two</div>
+          <ul class="setlist-songs">${renderSongList(show.set2, opts.highlightQuery)}</ul>
+        </div>
+        <div class="setlist-col setlist-col--full">
+          <div class="setlist-col-title">Encore</div>
+          ${encoreHtml}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Event delegation: one listener per container handles every card's
+// toggle, including cards added to the DOM later (search re-renders).
+function attachAccordionDelegation(container){
+  container.addEventListener("click", (e)=>{
+    const header = e.target.closest(".show-card__header");
+    if (!header) return;
+    const card = header.closest(".show-card");
+    const willOpen = card.getAttribute("data-open") !== "true";
+    card.setAttribute("data-open", String(willOpen));
+    header.setAttribute("aria-expanded", String(willOpen));
+    if (willOpen) openShowIds.add(card.dataset.showId);
+    else openShowIds.delete(card.dataset.showId);
+  });
+}
+
+/* =====================================================================
+   SECTION 4 — SHOWS TAB
+   ===================================================================== */
+function renderShowsTab(){
+  document.getElementById("showsTourMeta").innerHTML =
+    `<b>${SHOWS.length}</b> documented shows in 1977 &middot; full setlists for every one &middot; tap a date to open it`;
+
+  let html = "";
+  let lastLeg = -1;
+  SHOWS.forEach(show=>{
+    const legIdx = legIndexForShow(show);
+    if (legIdx !== lastLeg){
+      html += `<div class="leg-divider">${TOUR_LEGS[legIdx].label}</div>`;
+      lastLeg = legIdx;
+    }
+    html += renderShowCard(show);
+  });
+  document.getElementById("showsList").innerHTML = html;
+}
+
+/* =====================================================================
+   SECTION 5 — SEARCH TAB
+   ===================================================================== */
+let searchMode = "venue"; // "venue" | "song"
+
+function setSearchMode(mode){
+  searchMode = mode;
+  document.getElementById("modeVenueBtn").setAttribute("aria-pressed", String(mode === "venue"));
+  document.getElementById("modeSongBtn").setAttribute("aria-pressed", String(mode === "song"));
+  const input = document.getElementById("searchInput");
+  input.placeholder = mode === "venue" ? "Search venues or cities\u2026" : "Search for a song\u2026";
+  document.getElementById("searchHint").textContent = mode === "venue"
+    ? "Try \u201cWinterland\u201d, \u201cChicago\u201d, or a state like \u201cNY\u201d."
+    : "Try \u201cScarlet\u201d, \u201cTerrapin\u201d, or \u201cDrums\u201d.";
+  renderSearchTab();
+}
+
+function renderSearchTab(){
+  const query = document.getElementById("searchInput").value.trim();
+  const resultsEl = document.getElementById("searchResults");
+
+  if (!query){
+    resultsEl.innerHTML = `<div class="empty-state">Start typing to search ${
+      searchMode === "venue" ? "venues, cities, or states" : "songs played in 1977"
+    }.</div>`;
+    return;
+  }
+
+  if (searchMode === "venue"){
+    const matches = SHOWS.filter(s => showMatchesVenueQuery(s, query));
+    resultsEl.innerHTML = matches.length
+      ? matches.map(s => renderShowCard(s)).join("")
+      : `<div class="empty-state">No shows match &ldquo;${escapeHtml(query)}&rdquo;.</div>`;
+  } else {
+    const matches = SHOWS.filter(s => showMatchesSongQuery(s, query));
+    if (!matches.length){
+      resultsEl.innerHTML = `<div class="empty-state">No song matches &ldquo;${escapeHtml(query)}&rdquo;. Try a shorter fragment.</div>`;
+      return;
+    }
+    const summary = `<div class="search-song-summary">Matches songs played at ${matches.length} of ${SHOWS.length} shows in 1977</div>`;
+    resultsEl.innerHTML = summary + matches.map(s => renderShowCard(s, { highlightQuery: query })).join("");
+  }
+}
+
+/* =====================================================================
+   SECTION 6 — STATS TAB
+   ===================================================================== */
+let statsSortMode = "count"; // "count" | "alpha"
+
+function renderStatsTab(){
+  const counts = songCounts(SHOWS);
+  const byCount = [...counts.entries()].sort((a,b)=> b[1] - a[1]);
+  const mostPlayed = byCount[0];
+  const totalUnique = counts.size;
+  const totalPerformances = allPerformances(SHOWS).length;
+  const withLengths = SHOWS.map(s => ({ show: s, total: totalSongsInShow(s) }));
+  const longest  = withLengths.reduce((a,b)=> b.total > a.total ? b : a);
+  const shortest = withLengths.reduce((a,b)=> b.total < a.total ? b : a);
+  const avgLen = (totalPerformances / SHOWS.length).toFixed(1);
+
+  const tiles = [
+    { value: SHOWS.length,   label: "Shows in 1977",        sub: "Feb 26 &ndash; Dec 31" },
+    { value: mostPlayed[1],  label: "Most-played song",     sub: escapeHtml(mostPlayed[0]) },
+    { value: totalUnique,    label: "Unique songs played",  sub: "across the whole tour" },
+    { value: avgLen,         label: "Avg. songs / show",    sub: "set 1 + set 2 + encore" },
+    { value: longest.total,  label: "Longest setlist",      sub: `${longest.show.dateDisplay} &middot; ${escapeHtml(longest.show.city)}` },
+    { value: shortest.total, label: "Shortest setlist",     sub: `${shortest.show.dateDisplay} &middot; ${escapeHtml(shortest.show.city)}` }
+  ];
+  document.getElementById("statTiles").innerHTML = tiles.map(t => `
+    <div class="stat-tile">
+      <div class="stat-tile__value">${t.value}</div>
+      <div class="stat-tile__label">${t.label}</div>
+      <div class="stat-tile__sub">${t.sub}</div>
+    </div>`).join("");
+
+  renderStatsTable(byCount);
+}
+
+function renderStatsTable(byCount){
+  const maxCount = byCount[0][1];
+  const rows = statsSortMode === "count"
+    ? byCount
+    : [...byCount].sort((a,b)=> a[0].localeCompare(b[0]));
+
+  document.getElementById("statsTableBody").innerHTML = rows.map(([song, count], i)=> `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${escapeHtml(song)}<div class="stats-table__bar" style="width:${Math.max(4, count / maxCount * 100)}%"></div></td>
+      <td>${count}</td>
+    </tr>`).join("");
+}
+
+/* =====================================================================
+   SECTION 7 — GRAPHICS TAB / SVG CHART BUILDERS
+   Every chart below is hand-rolled inline SVG — no charting library.
+   Viewbox dimensions are sized close to a typical mobile content width
+   so text stays close to true size on phones and simply scales up
+   (never down past readable) on wider screens.
+   ===================================================================== */
+
+function renderBarChart(){
+  const counts = songCounts(SHOWS);
+  const top = [...counts.entries()].sort((a,b)=> b[1] - a[1]).slice(0, 15);
+  const max = top[0][1];
+
+  const width = 320, leftPad = 130, rightPad = 28, rowH = 22, topPad = 6;
+  const height = topPad + top.length * rowH + 4;
+  const plotW = width - leftPad - rightPad;
+
+  let bars = "";
+  top.forEach(([song, count], i)=>{
+    const yTop = topPad + i * rowH;
+    const barW = Math.max(2, (count / max) * plotW);
+    const barY = yTop + 3;
+    const barH = rowH - 8;
+    const labelY = yTop + rowH / 2 + 3.5;
+    bars += `
+      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="9.5">${escapeHtml(truncate(song, 20))}</text>
+      <rect x="${leftPad}" y="${barY}" width="${barW.toFixed(1)}" height="${barH}" rx="2.5" fill="${THEME.gold}">
+        <title>${escapeHtml(song)}: ${count} performances</title>
+      </rect>
+      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="10" fill="${THEME.goldBright}" font-weight="600">${count}</text>`;
+  });
+
+  document.getElementById("chartBar").innerHTML =
+    `<svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Bar chart of the 15 most-played songs in 1977">${bars}</svg>`;
+}
+
+function renderStateBarChart(){
+  const byState = showCountsByState(SHOWS); // already sorted, most shows first
+  const max = byState[0][1];
+
+  const width = 320, leftPad = 46, rightPad = 28, rowH = 17, topPad = 6;
+  const height = topPad + byState.length * rowH + 4;
+  const plotW = width - leftPad - rightPad;
+
+  let bars = "";
+  byState.forEach(([state, count], i)=>{
+    const yTop = topPad + i * rowH;
+    const barW = Math.max(2, (count / max) * plotW);
+    const barY = yTop + 2;
+    const barH = rowH - 6;
+    const labelY = yTop + rowH / 2 + 3.2;
+    bars += `
+      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="9.5">${escapeHtml(state)}</text>
+      <rect x="${leftPad}" y="${barY}" width="${barW.toFixed(1)}" height="${barH}" rx="2.5" fill="${THEME.rose}">
+        <title>${escapeHtml(state)}: ${count} show${count === 1 ? "" : "s"}</title>
+      </rect>
+      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="9.5" fill="${THEME.gold}" font-weight="600">${count}</text>`;
+  });
+
+  document.getElementById("chartBarState").innerHTML =
+    `<svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Bar chart of 1977 shows by state, most to fewest">${bars}</svg>`;
+}
+
+function renderStatePie(){
+  const byState = showCountsByState(SHOWS);
+  const topN = 5;
+  const top = byState.slice(0, topN);
+  const rest = byState.slice(topN);
+  const restTotal = rest.reduce((sum, [, count]) => sum + count, 0);
+
+  const colors = [THEME.gold, THEME.rose, THEME.teal, THEME.plum, THEME.goldBright];
+  const data = top.map(([state, count], i) => ({ label: state, value: count, color: colors[i] }));
+  if (restTotal > 0){
+    data.push({ label: `Other (${rest.length} states)`, value: restTotal, color: THEME.textMuted });
+  }
+  renderPieChart("chartPieState", data, "Pie chart of the top states by number of 1977 shows");
+}
+
+// Generic pie chart: data = [{label, value, color}]
+function renderPieChart(containerId, data, ariaLabel){
+  const total = data.reduce((sum, d)=> sum + d.value, 0);
+  const size = 200, cx = size / 2, cy = size / 2, r = size / 2 - 6;
+  let angle = -Math.PI / 2;
+  let paths = "";
+
+  data.forEach(d=>{
+    const fraction = d.value / total;
+    const nextAngle = angle + fraction * Math.PI * 2;
+    const x1 = cx + r * Math.cos(angle),     y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(nextAngle), y2 = cy + r * Math.sin(nextAngle);
+    const largeArc = (nextAngle - angle) > Math.PI ? 1 : 0;
+    // Single-slice pies (100%) need a full circle, not a degenerate arc.
+    const d1 = fraction >= 0.999
+      ? `M${cx},${cy - r} A${r},${r} 0 1 1 ${cx - 0.01},${cy - r} Z`
+      : `M${cx},${cy} L${x1.toFixed(2)},${y1.toFixed(2)} A${r},${r} 0 ${largeArc} 1 ${x2.toFixed(2)},${y2.toFixed(2)} Z`;
+    paths += `<path d="${d1}" fill="${d.color}" stroke="${THEME.bgPanel}" stroke-width="2"><title>${escapeHtml(d.label)}: ${d.value} (${Math.round(fraction*100)}%)</title></path>`;
+    angle = nextAngle;
+  });
+
+  const svg = `<svg class="chart-svg" viewBox="0 0 ${size} ${size}" style="max-width:200px;display:block;margin:0 auto" role="img" aria-label="${escapeHtml(ariaLabel)}">${paths}</svg>`;
+  const legend = `<div class="chart-legend">${data.map(d => `
+    <div class="chart-legend__item">
+      <span class="chart-legend__swatch" style="background:${d.color}"></span>
+      ${escapeHtml(d.label)} &middot; ${d.value} (${Math.round(d.value / total * 100)}%)
+    </div>`).join("")}</div>`;
+
+  document.getElementById(containerId).innerHTML = svg + legend;
+}
+
+function renderSlotPie(){
+  const perfs = allPerformances(SHOWS);
+  const set1 = perfs.filter(p => p.setName === "set1").length;
+  const set2 = perfs.filter(p => p.setName === "set2").length;
+  const enc  = perfs.filter(p => p.setName === "encore").length;
+  renderPieChart("chartPieSlot", [
+    { label: "Set One", value: set1, color: THEME.gold },
+    { label: "Set Two",  value: set2, color: THEME.rose },
+    { label: "Encore",   value: enc,  color: THEME.teal }
+  ], "Pie chart of song performances by set");
+}
+
+function renderRegionPie(){
+  const counts = {};
+  SHOWS.forEach(s=>{
+    const region = regionForState(s.state, s.country);
+    counts[region] = (counts[region] || 0) + 1;
+  });
+  const colors = {
+    Northeast: THEME.gold, West: THEME.rose, South: THEME.teal,
+    Midwest: THEME.plum, Canada: THEME.goldBright, Other: THEME.textMuted
+  };
+  const data = Object.entries(counts)
+    .sort((a,b)=> b[1] - a[1])
+    .map(([label, value]) => ({ label, value, color: colors[label] || THEME.textMuted }));
+  renderPieChart("chartPieRegion", data, "Pie chart of shows by touring region");
+}
+
+function renderScatterChart(){
+  const points = SHOWS.map((s, i)=> ({ x: i, total: totalSongsInShow(s), show: s }));
+  const width = 320, height = 210, padL = 26, padR = 8, padT = 10, padB = 26;
+  const plotW = width - padL - padR, plotH = height - padT - padB;
+  const totals = points.map(p => p.total);
+  const maxTotal = Math.max(...totals), minTotal = Math.min(...totals);
+  const n = points.length;
+
+  const xFor = i => padL + (i / (n - 1)) * plotW;
+  const yFor = total => padT + plotH - ((total - minTotal) / ((maxTotal - minTotal) || 1)) * plotH;
+
+  let gridLines = "";
+  const yTicks = 4;
+  for (let t = 0; t <= yTicks; t++){
+    const val = Math.round(minTotal + (t / yTicks) * (maxTotal - minTotal));
+    const y = yFor(val);
+    gridLines += `<line x1="${padL}" x2="${width - padR}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${THEME.textMuted}" stroke-opacity="0.15"/>`;
+    gridLines += `<text x="${padL - 6}" y="${(y + 3).toFixed(1)}" text-anchor="end" font-size="8.5">${val}</text>`;
+  }
+
+  // One label per calendar month, placed at that month's first show.
+  const monthFirstIndex = {};
+  SHOWS.forEach((s, i)=>{
+    const month = s.dateDisplay.split(" ")[0];
+    if (!(month in monthFirstIndex)) monthFirstIndex[month] = i;
+  });
+  let xLabels = "";
+  Object.entries(monthFirstIndex).forEach(([month, i])=>{
+    xLabels += `<text x="${xFor(i).toFixed(1)}" y="${height - 8}" text-anchor="middle" font-size="8.5">${month}</text>`;
+  });
+
+  let dots = "";
+  points.forEach(p=>{
+    dots += `<circle cx="${xFor(p.x).toFixed(1)}" cy="${yFor(p.total).toFixed(1)}" r="3.2" fill="${THEME.gold}" fill-opacity="0.88">
+      <title>${escapeHtml(p.show.dateDisplay)} \u2014 ${escapeHtml(p.show.venue)}: ${p.total} songs</title>
+    </circle>`;
+  });
+
+  document.getElementById("chartScatter").innerHTML = `
+    <svg class="chart-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter plot of songs performed per show across 1977">
+      ${gridLines}
+      <line x1="${padL}" x2="${width - padR}" y1="${(padT + plotH).toFixed(1)}" y2="${(padT + plotH).toFixed(1)}" stroke="${THEME.textMuted}" stroke-opacity="0.4"/>
+      ${xLabels}
+      ${dots}
+    </svg>`;
+}
+
+let graphicsRendered = false;
+function renderGraphicsTab(){
+  if (graphicsRendered) return;
+  renderBarChart();
+  renderStateBarChart();
+  renderStatePie();
+  renderSlotPie();
+  renderRegionPie();
+  renderScatterChart();
+  graphicsRendered = true;
+}
+
+/* =====================================================================
+   SECTION 8 — TAB SWITCHING
+   ===================================================================== */
+let statsRendered = false;
+
+function switchTab(tabName){
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.setAttribute("aria-selected", String(btn.dataset.tab === tabName));
+  });
+  document.querySelectorAll(".tab-panel").forEach(panel=>{
+    panel.classList.toggle("is-active", panel.id === "tab-" + tabName);
+  });
+  if (tabName === "stats" && !statsRendered){ renderStatsTab(); statsRendered = true; }
+  if (tabName === "graphics") renderGraphicsTab();
+}
+
+/* =====================================================================
+   SECTION 9 — INIT
+   Script runs at the end of body, so the DOM above is already parsed;
+   no need to wait for DOMContentLoaded.
+   ===================================================================== */
+function init(){
+  renderShowsTab();
+  attachAccordionDelegation(document.getElementById("showsList"));
+  attachAccordionDelegation(document.getElementById("searchResults"));
+  renderSearchTab();
+
+  document.querySelectorAll(".tab-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> switchTab(btn.dataset.tab));
+  });
+  document.getElementById("modeVenueBtn").addEventListener("click", ()=> setSearchMode("venue"));
+  document.getElementById("modeSongBtn").addEventListener("click", ()=> setSearchMode("song"));
+  document.getElementById("searchInput").addEventListener("input", renderSearchTab);
+  document.getElementById("statsSortBtn").addEventListener("click", ()=>{
+    statsSortMode = statsSortMode === "count" ? "alpha" : "count";
+    document.getElementById("statsSortBtn").textContent = statsSortMode === "count" ? "A\u2013Z" : "Most played";
+    renderStatsTable([...songCounts(SHOWS).entries()].sort((a,b)=> b[1] - a[1]));
+  });
+}
+
+init();
+</script>
+</body>
+</html>

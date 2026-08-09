@@ -671,9 +671,17 @@ a{ color: var(--gold-bright); }
 .chart-legend__swatch{ width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
 .chart-tip{
   font-size: 11px;
-  fill: var(--ink);
   font-family: var(--font-mono);
 }
+/* .chart-svg text{fill:var(--text-muted)} above is (element+class) —
+   more specific than a bare .chart-tip class rule would be, so these
+   overrides need the same element+class shape to actually win. */
+.chart-svg text.chart-tip{ fill: var(--ink); }
+.chart-tip--sub{ font-weight: 400; }
+.chart-svg text.chart-tip--sub{ fill: var(--ink-soft); }
+.chart-tip-bg{ fill: var(--paper); stroke: var(--border-paper); stroke-width: 1; }
+.tourmap-dot{ cursor: pointer; }
+.tourmap-popup{ pointer-events: none; }
 
 /* ---------------------------------------------------------------------
    [8a] QUIZ TAB
@@ -1780,6 +1788,33 @@ function renderStatsTable(){
    (never down past readable) on wider screens.
    ===================================================================== */
 
+// Hidden-by-default popup <g> for one tour-map dot: a small paper-
+// colored callout with the venue name and city/state, toggled visible
+// by attachTourMapDelegation() on click/tap — a hover-only SVG <title>
+// tooltip never surfaces on touch devices, so this is the real UI for
+// mobile. Flips to whichever side keeps the box inside the map's
+// viewBox, since dots near the edges (Seattle, Toronto, San
+// Bernardino...) would otherwise clip off the visible chart.
+function buildTourMapPopup(index, [x, y], venue, place){
+  const boxW = 165, boxH = 34, pad = 7, gap = 6;
+  // Prefer right/above the dot, but flip to whichever side actually
+  // has room, then clamp as a final safety net — robust to box size
+  // changes, rather than a fixed x/y threshold guess.
+  const flipLeft = (x + gap + boxW) > MAP_W;
+  const flipDown = (y - gap - boxH) < 0;
+  let boxX = flipLeft ? x - gap - boxW : x + gap;
+  let boxY = flipDown ? y + gap : y - gap - boxH;
+  boxX = Math.max(2, Math.min(boxX, MAP_W - boxW - 2));
+  boxY = Math.max(2, Math.min(boxY, MAP_H - boxH - 2));
+  const textX = boxX + pad;
+  return `
+    <g class="tourmap-popup" data-index="${index}" visibility="hidden">
+      <rect class="chart-tip-bg" x="${boxX.toFixed(1)}" y="${boxY.toFixed(1)}" width="${boxW}" height="${boxH}" rx="4"/>
+      <text class="chart-tip" x="${textX.toFixed(1)}" y="${(boxY + 15).toFixed(1)}" font-weight="700">${escapeHtml(truncate(venue, 20))}</text>
+      <text class="chart-tip chart-tip--sub" x="${textX.toFixed(1)}" y="${(boxY + 27).toFixed(1)}">${escapeHtml(place)}</text>
+    </g>`;
+}
+
 // "The 1977 tour route" — the US outline from the geographic data block
 // above, a dot per unique city, and a line between each consecutive
 // pair of shows (in chronological SHOWS order) colored by whichever
@@ -1801,19 +1836,22 @@ function renderTourMapChart(){
 
   // One dot per unique city; tooltip lists every date played there,
   // since a handful of cities (Winterland, the Palladium...) span
-  // multiple legs.
+  // multiple legs. Each dot also gets a tap/click-triggered popup
+  // (venue + city) via attachTourMapDelegation() below, for touch
+  // devices where a hover-only <title> tooltip never surfaces.
   const byCity = new Map();
   SHOWS.forEach(s=>{
     const key = `${s.city}|${s.state}`;
     if (!byCity.has(key)) byCity.set(key, { show: s, dates: [] });
     byCity.get(key).dates.push(s.dateDisplay);
   });
-  let dots = "";
-  byCity.forEach(({ show, dates })=>{
+  let dots = "", popups = "";
+  [...byCity.values()].forEach(({ show, dates }, i)=>{
     const p = projectShow(show);
     if (!p) return;
     const place = show.country ? `${show.city}, ${show.state}, ${show.country}` : `${show.city}, ${show.state}`;
-    dots += `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="2.4" fill="${THEME.textMuted}" fill-opacity="0.9"><title>${escapeHtml(place)} — ${escapeHtml(dates.join(", "))}</title></circle>`;
+    dots += `<circle class="tourmap-dot" data-index="${i}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="${THEME.textMuted}" fill-opacity="0.9"><title>${escapeHtml(place)} — ${escapeHtml(dates.join(", "))}</title></circle>`;
+    popups += buildTourMapPopup(i, p, show.venue, place);
   });
 
   // Ringed markers for the very first and very last show of the year.
@@ -1831,11 +1869,12 @@ function renderTourMapChart(){
     .map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`)
     .join(" ");
 
-  const svg = `<svg class="chart-svg" viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="Map tracing the 1977 tour route, color-coded by tour leg">
+  const svg = `<svg class="chart-svg" viewBox="0 0 ${MAP_W} ${MAP_H}" role="img" aria-label="Map tracing the 1977 tour route, color-coded by tour leg. Tap a city to see its venue.">
     <polygon points="${outlinePoints}" fill="${THEME.bgPanelHi}" stroke="${THEME.textMuted}" stroke-opacity="0.35" stroke-width="1" stroke-linejoin="round"/>
     ${segments}
     ${dots}
     ${markers}
+    ${popups}
   </svg>`;
 
   const legend = `<div class="chart-legend">${TOUR_LEGS.map((leg, i) => `
@@ -1845,6 +1884,27 @@ function renderTourMapChart(){
     </div>`).join("")}</div>`;
 
   document.getElementById("chartTourMap").innerHTML = svg + legend;
+}
+
+// Click/tap a .tourmap-dot to show its matching .tourmap-popup (venue
+// + city), hiding any other popup that was open; click the same dot
+// again, or anywhere else on the map, to close it. Event-delegated on
+// the chart container so it keeps working across re-renders, same
+// pattern as attachAccordionDelegation() for the show cards.
+function attachTourMapDelegation(){
+  const container = document.getElementById("chartTourMap");
+  container.addEventListener("click", (e)=>{
+    const popups = container.querySelectorAll(".tourmap-popup");
+    const dot = e.target.closest(".tourmap-dot");
+    if (!dot){
+      popups.forEach(p => p.setAttribute("visibility", "hidden"));
+      return;
+    }
+    const target = container.querySelector(`.tourmap-popup[data-index="${dot.dataset.index}"]`);
+    const wasVisible = target && target.getAttribute("visibility") === "visible";
+    popups.forEach(p => p.setAttribute("visibility", "hidden"));
+    if (target && !wasVisible) target.setAttribute("visibility", "visible");
+  });
 }
 
 function renderBarChart(){
@@ -2418,6 +2478,7 @@ function init(){
   renderShowsTab();
   attachAccordionDelegation(document.getElementById("showsList"));
   attachAccordionDelegation(document.getElementById("searchResults"));
+  attachTourMapDelegation();
   renderSearchTab();
 
   document.querySelectorAll(".tab-btn").forEach(btn=>{

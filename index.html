@@ -420,6 +420,41 @@ a{ color: var(--gold-bright); }
 }
 .tour-meta b{ color: var(--gold-bright); font-weight: 600; }
 
+.on-this-day-banner{
+  text-align: center;
+  margin: 0 2px 18px;
+  padding: 12px 16px;
+  background: rgba(223,164,61,0.14);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+.on-this-day-banner__link{ color: var(--gold-bright); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+.random-show-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0 auto 22px;
+  padding: 12px 18px;
+  background: var(--gold);
+  border: none;
+  border-radius: 999px;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background .16s ease, transform .16s ease;
+}
+.random-show-btn:hover{ background: var(--gold-bright); transform: translateY(-1px); }
+.random-show-btn svg{ width: 14px; height: 14px; flex-shrink: 0; }
+
 .leg-divider{
   display: flex;
   align-items: center;
@@ -709,6 +744,23 @@ a{ color: var(--gold-bright); }
   font-style: italic;
   font-weight: 400;
 }
+.rarest-setlists__caption{
+  padding: 0 16px 10px;
+  background: var(--paper);
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+.rarest-setlists td{ vertical-align: top; }
+.rarest-setlists td:first-child{ font-family: var(--font-mono); color: var(--ink-soft); width: auto; }
+.rarest-setlists td:last-child{ text-align: left; font-family: var(--font-body); color: var(--ink); font-weight: 400; font-size: 12.5px; }
+.rarest-setlists__link{ color: var(--rose); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.rarest-setlists__venue{ font-family: var(--font-body); font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+.rarest-setlists__count{
+  text-align: center !important;
+  font-family: var(--font-mono);
+  color: var(--rose);
+  font-weight: 700;
+}
 
 /* ---------------------------------------------------------------------
    [8] GRAPHICS TAB / SVG CHARTS
@@ -840,6 +892,8 @@ a{ color: var(--gold-bright); }
   line-height: 1.5;
   color: var(--ink-soft);
 }
+.quiz-explanation a{ color: var(--rose); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.quiz-explanation a:hover{ color: var(--ink); }
 
 .quiz-next-btn{
   display: block;
@@ -941,7 +995,12 @@ a{ color: var(--gold-bright); }
 
   <!-- ============================ SHOWS TAB ============================ -->
   <section class="tab-panel is-active" id="tab-shows" role="tabpanel" aria-labelledby="tab-btn-shows">
+    <div class="on-this-day-banner" id="onThisDayBanner" hidden></div>
     <div class="tour-meta" id="showsTourMeta"></div>
+    <button class="random-show-btn" id="randomShowBtn" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+      Random show
+    </button>
     <div id="showsList"></div>
   </section>
 
@@ -970,6 +1029,13 @@ a{ color: var(--gold-bright); }
         <button class="sort-btn" id="statsSortBtn" data-sort="count">A&ndash;Z</button>
       </div>
       <table class="stats-table"><tbody id="statsTableBody"></tbody></table>
+    </div>
+    <div class="stats-table-wrap" style="margin-top:16px">
+      <div class="stats-table-head">
+        <h3>Rarest setlists</h3>
+      </div>
+      <div class="rarest-setlists__caption">Ranked by how many songs in the show were played 3 times or fewer across all of 1977.</div>
+      <table class="stats-table rarest-setlists"><tbody id="rarestSetlistsBody"></tbody></table>
     </div>
   </section>
 
@@ -1783,6 +1849,11 @@ function renderShowCard(show, opts){
 
 // Event delegation: one listener per container handles every card's
 // toggle, including cards added to the DOM later (search re-renders).
+// Opening a card (from either the Shows or Search tab) also updates
+// the URL hash via replaceState — no navigation, no history-stack
+// spam, just keeps the address bar a shareable link to whatever's
+// currently open. See jumpToShow()/handleHashRoute() below for the
+// other direction (a hash opening a card on load or via a link click).
 function attachAccordionDelegation(container){
   container.addEventListener("click", (e)=>{
     const header = e.target.closest(".show-card__header");
@@ -1791,9 +1862,45 @@ function attachAccordionDelegation(container){
     const willOpen = card.getAttribute("data-open") !== "true";
     card.setAttribute("data-open", String(willOpen));
     header.setAttribute("aria-expanded", String(willOpen));
-    if (willOpen) openShowIds.add(card.dataset.showId);
-    else openShowIds.delete(card.dataset.showId);
+    if (willOpen){
+      openShowIds.add(card.dataset.showId);
+      try{ history.replaceState(null, "", "#" + card.dataset.showId); }catch(e){ /* ignore */ }
+    } else {
+      openShowIds.delete(card.dataset.showId);
+    }
   });
+}
+
+// Shared "go look at this show" primitive — used by deep links
+// (#1977-05-08 in the URL on load, or a hashchange from clicking a
+// link inside a quiz explanation or the rarest-setlists table), and by
+// the Random Show button. Switches to the Shows tab, opens the card,
+// and scrolls it into view.
+function jumpToShow(id, opts){
+  opts = opts || {};
+  if (!SHOWS.some(s => s.id === id)) return false;
+  switchTab("shows");
+  openShowIds.add(id);
+  renderShowsTab();
+  if (opts.updateHash !== false){
+    try{ history.replaceState(null, "", "#" + id); }catch(e){ /* ignore */ }
+  }
+  requestAnimationFrame(()=>{
+    const card = document.querySelector(`.show-card[data-show-id="${id}"]`);
+    if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+  return true;
+}
+
+// Reads location.hash and jumps there if it names a real show. Called
+// once on load (for a shared/bookmarked link) and again on every
+// "hashchange" event, which covers plain <a href="#1977-05-08"> clicks
+// anywhere on the page (quiz explanations, rarest-setlists rows) with
+// no extra click handlers needed.
+function handleHashRoute(){
+  const id = decodeURIComponent(location.hash.slice(1));
+  if (!id) return;
+  jumpToShow(id, { updateHash: false });
 }
 
 /* =====================================================================
@@ -1814,6 +1921,27 @@ function renderShowsTab(){
     html += renderShowCard(show);
   });
   document.getElementById("showsList").innerHTML = html;
+}
+
+// Compares today's real calendar month/day (from the visitor's own
+// clock, not a fixed date) against every show's id — "1977-MM-DD" —
+// ignoring the year, since every show is 1977. Most days this matches
+// nothing (60 shows out of 365 possible dates), which is expected; the
+// banner just stays hidden. Run once at load — "today" doesn't change
+// mid-session.
+function renderOnThisDayBanner(){
+  const el = document.getElementById("onThisDayBanner");
+  const today = new Date();
+  const month = today.getMonth() + 1, day = today.getDate();
+  const matches = SHOWS.filter(s=>{
+    const [, m, d] = s.id.split("-").map(Number);
+    return m === month && d === day;
+  });
+  if (!matches.length){ el.hidden = true; el.innerHTML = ""; return; }
+  el.hidden = false;
+  el.innerHTML = matches.map(s => `
+    <div>On this day in 1977: <a class="on-this-day-banner__link" href="#${s.id}">${s.dateDisplay} — ${escapeHtml(s.venue)}, ${escapeHtml(s.city)}</a></div>`
+  ).join("");
 }
 
 /* =====================================================================
@@ -1894,6 +2022,47 @@ function renderStatsTab(){
     </div>`).join("");
 
   renderStatsTable();
+  renderRarestSetlists();
+}
+
+// A song played this many times or fewer, across all of 1977, counts
+// as "rare" for the ranking below.
+const RARE_THRESHOLD = 3;
+
+// For one show: which of its songs are rare, plus a finer-grained
+// rarityScore (sum of 1/playCount across every song in the show) used
+// only as a tiebreaker — a show with three once-played songs should
+// still outrank one with three songs played right at the threshold,
+// even though both have "3 rare songs."
+function showRarity(show, countsMap){
+  const songs = [...new Set([...show.set1, ...show.set2, ...show.encore].map(songText))];
+  const rareSongs = songs.filter(s => (countsMap.get(s) || 0) <= RARE_THRESHOLD);
+  const rarityScore = songs.reduce((sum, s) => sum + 1 / (countsMap.get(s) || 1), 0);
+  return { rareSongs, rarityScore };
+}
+
+function renderRarestSetlists(){
+  const countsMap = new Map(statsByCount);
+  const ranked = SHOWS
+    .map(show => ({ show, ...showRarity(show, countsMap) }))
+    .sort((a, b) => b.rareSongs.length - a.rareSongs.length || b.rarityScore - a.rarityScore)
+    .slice(0, 8);
+
+  document.getElementById("rarestSetlistsBody").innerHTML = ranked.map(({ show, rareSongs })=>{
+    const songList = rareSongs.length
+      ? [...rareSongs].sort((a,b)=> (countsMap.get(a)||0) - (countsMap.get(b)||0))
+          .map(s => `${escapeHtml(s)} (${countsMap.get(s)}&times;)`).join(", ")
+      : "&mdash;";
+    const place = show.country ? `${show.city}, ${show.state}, ${show.country}` : `${show.city}, ${show.state}`;
+    return `<tr>
+      <td>
+        <a class="rarest-setlists__link" href="#${show.id}">${show.dateDisplay}</a>
+        <div class="rarest-setlists__venue">${escapeHtml(show.venue)}, ${escapeHtml(place)}</div>
+      </td>
+      <td class="rarest-setlists__count">${rareSongs.length}</td>
+      <td>${songList}</td>
+    </tr>`;
+  }).join("");
 }
 
 // Reads the current sort mode + statsFilterQuery off the cached
@@ -2320,7 +2489,7 @@ const QUIZ_TRIVIA_QUESTIONS = [
     prompt: "What was the name of the Grateful Dead's studio album released in 1977?",
     options: ["Terrapin Station", "Wake of the Flood", "Blues for Allah", "Shakedown Street"],
     correctIndex: 0,
-    explanation: "Terrapin Station came out July 27, 1977, on Arista Records — the title track had already entered the live sets that spring (see the Feb 26 tour opener)."
+    explanation: "Terrapin Station came out July 27, 1977, on Arista Records — the title track had already entered the live sets that spring (see the <a href=\"#1977-02-26\">Feb 26 tour opener</a>)."
   },
   {
     prompt: "What year did the Grateful Dead play their final concert at Winterland Arena?",
@@ -2433,7 +2602,7 @@ function generateCountQuestion(){
     [song, correct] = entries[Math.floor(Math.random() * entries.length)];
     const first = firstPerformanceOf(song);
     explanation = first
-      ? `${escapeHtml(song)} was played ${correct} time${correct === 1 ? "" : "s"} in 1977, first at ${first.dateDisplay} (${escapeHtml(first.venue)}).`
+      ? `${escapeHtml(song)} was played ${correct} time${correct === 1 ? "" : "s"} in 1977, first at <a href="#${first.id}">${first.dateDisplay}</a> (${escapeHtml(first.venue)}).`
       : `${escapeHtml(song)} was played ${correct} time${correct === 1 ? "" : "s"} in 1977.`;
   }
 
@@ -2487,10 +2656,9 @@ function generateVenueCountQuestion(){
     venue = v;
     place = `${city}, ${state}`;
     correct = count;
-    const dates = SHOWS
-      .filter(s => s.venue === v && s.city === city && s.state === state)
-      .map(s => s.dateDisplay);
-    explanation = `${escapeHtml(venue)} hosted ${correct} show${correct === 1 ? "" : "s"} in 1977: ${dates.join(", ")}.`;
+    const showsAtVenue = SHOWS.filter(s => s.venue === v && s.city === city && s.state === state);
+    const dateLinks = showsAtVenue.map(s => `<a href="#${s.id}">${s.dateDisplay}</a>`).join(", ");
+    explanation = `${escapeHtml(venue)} hosted ${correct} show${correct === 1 ? "" : "s"} in 1977: ${dateLinks}.`;
   }
 
   const options = shuffle([correct, ...distractorCountsFor(correct, allCounts)]);
@@ -2513,7 +2681,7 @@ function generateInternationalCountQuestion(){
   const correct = intlShows.length;
   const options = shuffle([correct, ...distractorCountsFor(correct, [])]);
   const explanation = correct
-    ? `${correct} show${correct === 1 ? "" : "s"} played outside the US in 1977: ${intlShows.map(s => `${s.dateDisplay} (${s.city}, ${s.country})`).join(", ")}.`
+    ? `${correct} show${correct === 1 ? "" : "s"} played outside the US in 1977: ${intlShows.map(s => `<a href="#${s.id}">${s.dateDisplay}</a> (${s.city}, ${s.country})`).join(", ")}.`
     : "Every 1977 show was played in the United States.";
   return {
     type: "international",
@@ -2704,6 +2872,19 @@ function init(){
     handleQuizAnswer(Number(btn.dataset.index));
   });
   document.getElementById("quizNextBtn").addEventListener("click", renderQuizQuestion);
+
+  renderOnThisDayBanner();
+  document.getElementById("randomShowBtn").addEventListener("click", ()=>{
+    const random = SHOWS[Math.floor(Math.random() * SHOWS.length)];
+    jumpToShow(random.id);
+  });
+  // Deep-linking: a URL hash on load (a shared/bookmarked link) opens
+  // straight to that show; "hashchange" catches every later hash-only
+  // navigation too — plain <a href="#1977-05-08"> links inside quiz
+  // explanations and the rarest-setlists table need no click handler
+  // of their own, they just work via this one listener.
+  window.addEventListener("hashchange", handleHashRoute);
+  handleHashRoute();
 }
 
 init();

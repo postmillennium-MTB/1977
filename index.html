@@ -2204,6 +2204,12 @@ const QUIZ_TRIVIA_QUESTIONS = [
     options: ["1977", "1974", "1976", "1978"],
     correctIndex: 0,
     explanation: "“The Grateful Dead Movie” hit theaters in June 1977 — years after it was filmed, during the famous five-night “closing of Winterland” run in October 1974."
+  },
+  {
+    prompt: "How many band members were in the Grateful Dead during the 1977 tour?",
+    options: ["7", "6", "8", "5"],
+    correctIndex: 0,
+    explanation: "Seven: Jerry Garcia (lead guitar, vocals), Bob Weir (rhythm guitar, vocals), Phil Lesh (bass, vocals), Keith Godchaux (keyboards), Donna Jean Godchaux (vocals), Bill Kreutzmann (drums), and Mickey Hart (drums)."
   }
 ];
 
@@ -2351,6 +2357,27 @@ function generateVenueCountQuestion(){
   };
 }
 
+// "How many shows were played outside the USA" — computed live from
+// SHOWS (any show with a `country` field set) rather than hardcoded,
+// same reasoning as the venue/song count questions: if a show's
+// country ever gets corrected, this can't quietly disagree with it.
+function generateInternationalCountQuestion(){
+  const intlShows = SHOWS.filter(s => s.country);
+  const correct = intlShows.length;
+  const options = shuffle([correct, ...distractorCountsFor(correct, [])]);
+  const explanation = correct
+    ? `${correct} show${correct === 1 ? "" : "s"} played outside the US in 1977: ${intlShows.map(s => `${s.dateDisplay} (${s.city}, ${s.country})`).join(", ")}.`
+    : "Every 1977 show was played in the United States.";
+  return {
+    type: "international",
+    typeLabel: "Geography",
+    prompt: "How many shows did the Grateful Dead play outside the USA in 1977?",
+    options: options.map(String),
+    correctIndex: options.indexOf(correct),
+    explanation
+  };
+}
+
 function generateTriviaQuestion(){
   const q = QUIZ_TRIVIA_QUESTIONS[Math.floor(Math.random() * QUIZ_TRIVIA_QUESTIONS.length)];
   const correctValue = q.options[q.correctIndex];
@@ -2367,9 +2394,10 @@ function generateTriviaQuestion(){
 
 function generateQuizQuestion(){
   const r = Math.random();
-  if (r < 0.35) return generateCountQuestion();
-  if (r < 0.55) return generateCompareQuestion();
-  if (r < 0.80) return generateVenueCountQuestion();
+  if (r < 0.30) return generateCountQuestion();
+  if (r < 0.48) return generateCompareQuestion();
+  if (r < 0.70) return generateVenueCountQuestion();
+  if (r < 0.78) return generateInternationalCountQuestion(); // single fixed fact — kept rare
   return generateTriviaQuestion();
 }
 

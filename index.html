@@ -326,14 +326,34 @@ a{ color: var(--gold-bright); }
   color: var(--rose);
 }
 .site-header__title{
-  font-size: clamp(28px, 6vw, 44px);
-  letter-spacing: 0.01em;
-  color: var(--paper);
-  margin: 6px 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15em;
+  margin: 10px 0 4px;
 }
-.site-header__title em{
-  font-style: normal;
-  color: var(--gold-bright);
+/* Unified hero treatment (see the "PMR Hero" artifact): Helvetica Neue,
+   weight 200, tight uppercase tracking, line 2 rendered as a hollow
+   outline. Font, weight and tracking stay identical across every color
+   scheme — only the outline/paper colors change, via the same CSS
+   custom properties [1] already swaps per theme. */
+.site-header__title-line1{
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 200;
+  font-size: clamp(15px, 3.4vw, 20px);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+.site-header__title-line2{
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 200;
+  font-size: clamp(38px, 9vw, 64px);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--gold-bright);
 }
 .site-header__sub{
   font-family: var(--font-mono);
@@ -986,7 +1006,10 @@ a{ color: var(--gold-bright); }
     </a>
   </div>
   <div class="site-header__eyebrow">Post Millennium Renaissance &middot; Field Guide</div>
-  <h1 class="site-header__title">Grateful Dead <em>1977</em></h1>
+  <h1 class="site-header__title">
+    <span class="site-header__title-line1">Grateful Dead</span>
+    <span class="site-header__title-line2">1977</span>
+  </h1>
   <div class="site-header__sub">SETLIST ATLAS &middot; 60 SHOWS &middot; FEB&ndash;DEC</div>
   <div class="site-header__rule"></div>
 </header>

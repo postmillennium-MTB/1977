@@ -946,7 +946,7 @@ a{ color: var(--gold-bright); }
     <div class="search-input-wrap">
       <input type="text" class="search-input" id="searchInput" placeholder="Search venues or cities&hellip;" autocomplete="off">
     </div>
-    <div class="search-hint" id="searchHint">Try &ldquo;Winterland&rdquo;, &ldquo;Chicago&rdquo;, or a state like &ldquo;NY&rdquo;.</div>
+    <div class="search-hint" id="searchHint">Try &ldquo;Winterland&rdquo;, &ldquo;Chicago&rdquo;, or a state like &ldquo;NY&rdquo; or &ldquo;Colorado&rdquo;.</div>
     <div id="searchResults"></div>
   </section>
 
@@ -1597,11 +1597,25 @@ function totalSongsInShow(show){
   return show.set1.length + show.set2.length + show.encore.length;
 }
 
+// Full names for every state.province code in SHOWS, so a venue/city
+// search also matches spelled-out names ("Colorado") and not just the
+// 2-letter code itself — "co".includes("colo") is false, so without
+// this a search for "colo" or "colorado" silently returned nothing
+// even though Denver, CO is right there in the data.
+const STATE_NAMES = {
+  AL:"Alabama", AZ:"Arizona", CA:"California", CO:"Colorado", CT:"Connecticut",
+  FL:"Florida", GA:"Georgia", IL:"Illinois", IN:"Indiana", KS:"Kansas",
+  LA:"Louisiana", MA:"Massachusetts", MD:"Maryland", MI:"Michigan", MN:"Minnesota",
+  MO:"Missouri", NJ:"New Jersey", NM:"New Mexico", NY:"New York", OK:"Oklahoma",
+  ON:"Ontario", OR:"Oregon", PA:"Pennsylvania", TX:"Texas", VA:"Virginia", WA:"Washington"
+};
+
 function showMatchesVenueQuery(show, q){
   q = q.toLowerCase();
   return show.venue.toLowerCase().includes(q)
     || show.city.toLowerCase().includes(q)
     || show.state.toLowerCase().includes(q)
+    || (STATE_NAMES[show.state] || "").toLowerCase().includes(q)
     || (show.country || "").toLowerCase().includes(q)
     || show.dateDisplay.toLowerCase().includes(q);
 }

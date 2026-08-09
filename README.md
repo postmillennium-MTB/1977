@@ -81,4 +81,6 @@ Everything else — the Search tab, Stats tab, and all eight charts — is compu
 
 Since this is Grateful Dead content rather than mountain biking, it uses its own theme instead of the PMR trail palette: deep indigo background, marigold and dusty-rose poster-ink accents, a cream "paper" surface for expanded setlists, system-font serif/mono/sans pairing (no web fonts), and ticket-stub-style tabs with a CSS-only perforated edge as the one signature flourish. All charts are hand-rolled inline SVG — no charting library.
 
+The header is a hero band using the PMR desert pattern (`moose-bolt-tile.webp` — a 640px, ~65KB derivative of the full-res `moose-bolt.png` asset, tiled as a CSS background with a dark scrim gradient fading into the page below it for text legibility).
+
 Three color schemes are available from the buttons at the top, named after the band's keyboardists in the order they held the chair: **Godchaux** (the default — Keith Godchaux was actually on keys for this '77 tour, in the same deep-indigo/marigold palette as the rest of the site), **Mydland** (1979–1990, restyled as a 70s/80s wood-paneled-den palette — espresso browns, harvest gold, rust, avocado green), and **Welnick** (1990–1995, restyled as early-90s neon — near-black background with hot-pink and electric-violet accents).

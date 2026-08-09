@@ -2074,16 +2074,16 @@ function renderGraphicsTab(){
    Every question is generated from SHOWS at answer-time, not authored
    by hand, so it can't drift out of sync with the data (add a show,
    the quiz pool updates automatically — same philosophy as Stats and
-   Graphics). Two exceptions, both below: QUIZ_TRAP_SONGS (well-known
-   Grateful Dead songs that hadn't been written yet in 1977, used as
-   "trick" answers whose correct count is 0 — that 0 is still
-   guaranteed correct by construction, since these titles simply don't
-   appear anywhere in SHOWS) and QUIZ_TRIVIA_QUESTIONS (a short list of
-   hand-written historical facts — studio album releases, venue
-   history — that aren't derivable from the setlist data at all).
-   Everything else, including "how many times did the band play at
-   venue X," is computed live so it can't go stale or disagree with
-   what the Shows tab itself lists.
+   Graphics). Three exceptions, all below: QUIZ_TRAP_SONGS and
+   QUIZ_TRAP_VENUES (well-known Grateful Dead songs/venues that weren't
+   part of 1977, used as "trick" answers whose correct count is 0 —
+   that 0 is still guaranteed correct by construction, since none of
+   these titles/venues appear anywhere in SHOWS) and
+   QUIZ_TRIVIA_QUESTIONS (a short list of hand-written historical facts
+   — studio album releases, venue history — that aren't derivable from
+   the setlist data at all). Everything else, including "how many
+   times did the band play at venue X," is computed live so it can't
+   go stale or disagree with what the Shows tab itself lists.
    ===================================================================== */
 const QUIZ_TRAP_SONGS = [
   { title: "Althea", note: "Althea wasn't played until 1979 — it hadn't been written yet in 1977." },
@@ -2096,6 +2096,12 @@ const QUIZ_TRAP_SONGS = [
   { title: "My Brother Esau", note: "My Brother Esau is a mid-1980s addition to the repertoire." },
   { title: "Foolish Heart", note: "Foolish Heart is a Built to Last-era song, first played in the late 1980s." },
   { title: "Victim or the Crime", note: "Victim or the Crime is a mid-1980s addition to the repertoire." }
+];
+
+// Same trick as QUIZ_TRAP_SONGS above, but for venues: places the band
+// played plenty in other years, just not 1977.
+const QUIZ_TRAP_VENUES = [
+  { venue: "Alpine Valley Music Theatre", place: "East Troy, WI", note: "Alpine Valley opened in 1977, but the Grateful Dead didn't play there until years later — it became a regular tour stop in the late 1980s." }
 ];
 
 // Historical trivia that has nothing to do with the setlist data itself
@@ -2253,20 +2259,35 @@ function generateCompareQuestion(){
 function generateVenueCountQuestion(){
   const entries = venueCounts();
   const allCounts = entries.map(([,c]) => c);
-  const [key, correct] = entries[Math.floor(Math.random() * entries.length)];
-  const [venue, city, state] = key.split("|");
-  const dates = SHOWS
-    .filter(s => s.venue === venue && s.city === city && s.state === state)
-    .map(s => s.dateDisplay);
+  const useTrap = Math.random() < 0.25;
+
+  let venue, place, correct, explanation;
+  if (useTrap){
+    const trap = QUIZ_TRAP_VENUES[Math.floor(Math.random() * QUIZ_TRAP_VENUES.length)];
+    venue = trap.venue;
+    place = trap.place;
+    correct = 0;
+    explanation = trap.note;
+  } else {
+    const [key, count] = entries[Math.floor(Math.random() * entries.length)];
+    const [v, city, state] = key.split("|");
+    venue = v;
+    place = `${city}, ${state}`;
+    correct = count;
+    const dates = SHOWS
+      .filter(s => s.venue === v && s.city === city && s.state === state)
+      .map(s => s.dateDisplay);
+    explanation = `${escapeHtml(venue)} hosted ${correct} show${correct === 1 ? "" : "s"} in 1977: ${dates.join(", ")}.`;
+  }
 
   const options = shuffle([correct, ...distractorCountsFor(correct, allCounts)]);
   return {
     type: "venue",
     typeLabel: "Venue count",
-    prompt: `How many times did the Grateful Dead play at ${escapeHtml(venue)} (${escapeHtml(city)}, ${escapeHtml(state)}) in 1977?`,
+    prompt: `How many times did the Grateful Dead play at ${escapeHtml(venue)} (${escapeHtml(place)}) in 1977?`,
     options: options.map(String),
     correctIndex: options.indexOf(correct),
-    explanation: `${escapeHtml(venue)} hosted ${correct} show${correct === 1 ? "" : "s"} in 1977: ${dates.join(", ")}.`
+    explanation
   };
 }
 

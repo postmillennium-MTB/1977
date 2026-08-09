@@ -2068,13 +2068,16 @@ function renderGraphicsTab(){
    Every question is generated from SHOWS at answer-time, not authored
    by hand, so it can't drift out of sync with the data (add a show,
    the quiz pool updates automatically — same philosophy as Stats and
-   Graphics). The one exception is QUIZ_TRAP_SONGS below: well-known
+   Graphics). Two exceptions, both below: QUIZ_TRAP_SONGS (well-known
    Grateful Dead songs that hadn't been written yet in 1977, used as
-   "trick" answers whose correct count is 0. That 0 is still guaranteed
-   correct by construction (these titles simply don't appear anywhere
-   in SHOWS) — only the flavor-text explanation is hand-written, and
-   deliberately hedged to decade/era rather than a specific date for
-   any debut I'm not fully certain of.
+   "trick" answers whose correct count is 0 — that 0 is still
+   guaranteed correct by construction, since these titles simply don't
+   appear anywhere in SHOWS) and QUIZ_TRIVIA_QUESTIONS (a short list of
+   hand-written historical facts — studio album releases, venue
+   history — that aren't derivable from the setlist data at all).
+   Everything else, including "how many times did the band play at
+   venue X," is computed live so it can't go stale or disagree with
+   what the Shows tab itself lists.
    ===================================================================== */
 const QUIZ_TRAP_SONGS = [
   { title: "Althea", note: "Althea wasn't played until 1979 — it hadn't been written yet in 1977." },
@@ -2087,6 +2090,25 @@ const QUIZ_TRAP_SONGS = [
   { title: "My Brother Esau", note: "My Brother Esau is a mid-1980s addition to the repertoire." },
   { title: "Foolish Heart", note: "Foolish Heart is a Built to Last-era song, first played in the late 1980s." },
   { title: "Victim or the Crime", note: "Victim or the Crime is a mid-1980s addition to the repertoire." }
+];
+
+// Historical trivia that has nothing to do with the setlist data itself
+// (studio album releases, venue history) — hand-written, unlike every
+// other question type in this section, and kept to a short list of
+// facts I'm confident about.
+const QUIZ_TRIVIA_QUESTIONS = [
+  {
+    prompt: "What was the name of the Grateful Dead's studio album released in 1977?",
+    options: ["Terrapin Station", "Wake of the Flood", "Blues for Allah", "Shakedown Street"],
+    correctIndex: 0,
+    explanation: "Terrapin Station came out July 27, 1977, on Arista Records — the title track had already entered the live sets that spring (see the Feb 26 tour opener)."
+  },
+  {
+    prompt: "What year did the Grateful Dead play their final concert at Winterland Arena?",
+    options: ["1977", "1978", "1979", "1976"],
+    correctIndex: 1,
+    explanation: "Winterland closed permanently after Bill Graham's New Year's Eve show on December 31, 1978 — the Grateful Dead's last performance there, famously also featuring The Blues Brothers."
+  }
 ];
 
 function shuffle(arr){
@@ -2131,6 +2153,20 @@ function distractorCountsFor(correct, allCounts){
 // quiz works even if Quiz is opened before Stats ever was.
 function quizSongEntries(){
   return statsByCount.length ? statsByCount : [...songCounts(SHOWS).entries()];
+}
+
+// [venue key, count] entries for every venue played in 1977, most-
+// played first. Keyed by "venue|city|state" rather than venue name
+// alone, since a couple of venue names repeat in different cities
+// (there are two different "Paramount Theatre"s, in Seattle and
+// Portland) — conflating those would silently misreport both.
+function venueCounts(){
+  const counts = new Map();
+  SHOWS.forEach(s=>{
+    const key = `${s.venue}|${s.city}|${s.state}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  return [...counts.entries()].sort((a,b)=> b[1] - a[1]);
 }
 
 function generateCountQuestion(){
@@ -2184,8 +2220,46 @@ function generateCompareQuestion(){
   };
 }
 
+function generateVenueCountQuestion(){
+  const entries = venueCounts();
+  const allCounts = entries.map(([,c]) => c);
+  const [key, correct] = entries[Math.floor(Math.random() * entries.length)];
+  const [venue, city, state] = key.split("|");
+  const dates = SHOWS
+    .filter(s => s.venue === venue && s.city === city && s.state === state)
+    .map(s => s.dateDisplay);
+
+  const options = shuffle([correct, ...distractorCountsFor(correct, allCounts)]);
+  return {
+    type: "venue",
+    typeLabel: "Venue count",
+    prompt: `How many times did the Grateful Dead play at ${escapeHtml(venue)} (${escapeHtml(city)}, ${escapeHtml(state)}) in 1977?`,
+    options: options.map(String),
+    correctIndex: options.indexOf(correct),
+    explanation: `${escapeHtml(venue)} hosted ${correct} show${correct === 1 ? "" : "s"} in 1977: ${dates.join(", ")}.`
+  };
+}
+
+function generateTriviaQuestion(){
+  const q = QUIZ_TRIVIA_QUESTIONS[Math.floor(Math.random() * QUIZ_TRIVIA_QUESTIONS.length)];
+  const correctValue = q.options[q.correctIndex];
+  const options = shuffle(q.options);
+  return {
+    type: "trivia",
+    typeLabel: "Deep cut",
+    prompt: q.prompt,
+    options,
+    correctIndex: options.indexOf(correctValue),
+    explanation: q.explanation
+  };
+}
+
 function generateQuizQuestion(){
-  return Math.random() < 0.5 ? generateCountQuestion() : generateCompareQuestion();
+  const r = Math.random();
+  if (r < 0.35) return generateCountQuestion();
+  if (r < 0.55) return generateCompareQuestion();
+  if (r < 0.80) return generateVenueCountQuestion();
+  return generateTriviaQuestion();
 }
 
 let currentQuizQuestion = null;

@@ -261,6 +261,7 @@ a{ color: var(--gold-bright); }
   flex-wrap: wrap;
 }
 .theme-btn{
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -273,9 +274,29 @@ a{ color: var(--gold-bright); }
   font-size: 11px;
   letter-spacing: 0.04em;
   cursor: pointer;
+  overflow: hidden;
   transition: background .16s ease, border-color .16s ease, color .16s ease;
 }
 .theme-btn:hover{ color: var(--text-light); border-color: var(--gold); }
+/* A random unselected theme button "shimmers" every 7s — see
+   scheduleThemeShimmer() — as a small ambient hint that there are
+   more color schemes to try. Pseudo-element sweep so it never
+   disturbs the button's own layout/content. */
+.theme-btn.is-shimmering::after{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.55) 50%, transparent 80%);
+  animation: theme-btn-shimmer-sweep 1.1s ease;
+  pointer-events: none;
+}
+@keyframes theme-btn-shimmer-sweep{
+  from{ transform: translateX(0%); }
+  to{ transform: translateX(340%); }
+}
 .theme-btn[aria-pressed="true"]{
   background: var(--gold);
   border-color: var(--gold);
@@ -2574,6 +2595,24 @@ function initTheme(){
   document.querySelectorAll(".theme-btn").forEach(btn=>{
     btn.addEventListener("click", ()=> applyTheme(btn.dataset.theme));
   });
+  scheduleThemeShimmer();
+}
+
+// Every 7s, picks one *unselected* theme button at random and lets its
+// .is-shimmering CSS sweep play once (see [theme-btn.is-shimmering]).
+// Self-cleans via animationend rather than a matching setTimeout, so it
+// can't outlive the animation even if a click swaps the active theme
+// mid-sweep. prefers-reduced-motion already collapses the animation's
+// duration to ~0 via the global rule, so no extra check needed here.
+function scheduleThemeShimmer(){
+  setInterval(()=>{
+    const candidates = [...document.querySelectorAll(".theme-btn")]
+      .filter(btn => btn.getAttribute("aria-pressed") !== "true");
+    if (!candidates.length) return;
+    const btn = candidates[Math.floor(Math.random() * candidates.length)];
+    btn.classList.add("is-shimmering");
+    btn.addEventListener("animationend", ()=> btn.classList.remove("is-shimmering"), { once: true });
+  }, 7000);
 }
 
 /* =====================================================================

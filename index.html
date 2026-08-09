@@ -240,7 +240,7 @@ a{ color: var(--gold-bright); }
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 14px;
+  padding: 11px 14px;
   background: var(--bg-panel);
   border: 1px solid var(--border-soft);
   border-radius: 999px;
@@ -265,7 +265,7 @@ a{ color: var(--gold-bright); }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 12px 7px 8px;
+  padding: 11px 12px 11px 8px;
   background: var(--bg-panel);
   border: 1px solid var(--border-soft);
   border-radius: 999px;
@@ -877,6 +877,14 @@ a{ color: var(--gold-bright); }
 @media (max-width: 480px){
   .setlist-grid{ grid-template-columns: 1fr; }
   .stat-grid{ grid-template-columns: repeat(2, 1fr); }
+  /* All 5 tabs are ~32px wider than a 375px-ish phone at the default
+     padding, which forces the nav to scroll on tap (focus-scroll) and
+     visually clips whichever tab sits at the left edge. Tightening
+     padding here is enough for all 5 to fit with no scroll needed. */
+  .tab-btn{ padding: 11px 11px 15px; font-size: 13.5px; }
+  /* At the default letter-spacing this wraps mid-phrase on a phone
+     ("...RENAISSANCE · FIELD" / "GUIDE" alone on its own line). */
+  .site-header__eyebrow{ font-size: 9.5px; letter-spacing: 0.16em; }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -1982,7 +1990,14 @@ function renderTourMapChart(){
     const p = projectShow(show);
     if (!p) return;
     const place = show.country ? `${show.city}, ${show.state}, ${show.country}` : `${show.city}, ${show.state}`;
-    dots += `<circle class="tourmap-dot" data-index="${i}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="${THEME.textMuted}" fill-opacity="0.9"><title>${escapeHtml(place)} — ${escapeHtml(dates.join(", "))}</title></circle>`;
+    const tipHtml = `<title>${escapeHtml(place)} — ${escapeHtml(dates.join(", "))}</title>`;
+    // A visible r=3.2 dot alone renders at ~6px on a phone screen — far
+    // too small to reliably tap. An invisible r=7 circle underneath
+    // (same class/data-index, so it's an equally valid click target
+    // via .closest(".tourmap-dot") in attachTourMapDelegation) gives a
+    // real touch target without changing how the map looks.
+    dots += `<circle class="tourmap-dot" data-index="${i}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="7" fill="transparent">${tipHtml}</circle>`;
+    dots += `<circle class="tourmap-dot" data-index="${i}" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.2" fill="${THEME.textMuted}" fill-opacity="0.9">${tipHtml}</circle>`;
     popups += buildTourMapPopup(i, p, show.venue, place);
   });
 

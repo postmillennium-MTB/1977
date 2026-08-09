@@ -511,6 +511,14 @@ a{ color: var(--gold-bright); }
   color: var(--text-muted);
   margin-top: 1px;
 }
+.show-card__rec-badge{
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 6px;
+  width: 12px; height: 12px;
+  color: var(--rose);
+}
+.show-card__rec-badge svg{ width: 100%; height: 100%; display: block; }
 .show-card__chevron{
   flex-shrink: 0;
   width: 18px; height: 18px;
@@ -1269,23 +1277,27 @@ const SHOWS = [
 { id:"1977-05-07", dateDisplay:"May 7, 1977", venue:"Boston Garden", city:"Boston", state:"MA",
   set1:["Bertha","Cassidy","Deal","Jack Straw","Peggy-O","New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Big River","Tennessee Jed","The Music Never Stopped"],
   set2:["Terrapin Station","Samson and Delilah","Friend of the Devil","Estimated Prophet","Eyes of the World","Drums","The Wheel","Wharf Rat","Around and Around"],
-  encore:["U.S. Blues"] },
+  encore:["U.S. Blues"],
+  archiveId:"gd1977-05-07.148736.SBD.Betty.Anon.Noel.t-flac2448" },
 
 { id:"1977-05-08", dateDisplay:"May 8, 1977", venue:"Barton Hall, Cornell University", city:"Ithaca", state:"NY",
   set1:["New Minglewood Blues","Loser","El Paso","They Love Each Other","Jack Straw","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Brown-Eyed Women","Mama Tried","Row Jimmy","Dancin' in the Streets"],
   set2:[{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Estimated Prophet",{t:"St. Stephen",seg:true},{t:"Not Fade Away",seg:true},{t:"St. Stephen",seg:true},"Morning Dew"],
   encore:["One More Saturday Night"],
-  notes:"Cornell '77 — probably the single most famous Grateful Dead recording in circulation. Added to the Library of Congress National Recording Registry in 2011; fans queued outside Barton Hall as sleet moved in that afternoon." },
+  notes:"Cornell '77 — probably the single most famous Grateful Dead recording in circulation. Added to the Library of Congress National Recording Registry in 2011; fans queued outside Barton Hall as sleet moved in that afternoon.",
+  archiveId:"gd1977-05-08.mtx.seamons.97274.sbeok.flac16" },
 
 { id:"1977-05-09", dateDisplay:"May 9, 1977", venue:"War Memorial Auditorium", city:"Buffalo", state:"NY",
   set1:["Help on the Way","Slipknot!","Franklin's Tower","Cassidy","Brown-Eyed Women","Mexicali Blues","Tennessee Jed","Big River","Peggy-O","Sunrise","The Music Never Stopped"],
   set2:["Bertha","Good Lovin'","Ship of Fools","Estimated Prophet","The Other One","Drums","Not Fade Away","Comes a Time","Sugar Magnolia"],
-  encore:["Uncle John's Band"] },
+  encore:["Uncle John's Band"],
+  archiveId:"gd1977-05-09.135189.mtx.dusborne.flac16" },
 
 { id:"1977-05-11", dateDisplay:"May 11, 1977", venue:"St. Paul Civic Center", city:"St. Paul", state:"MN",
   set1:["Promised Land","They Love Each Other","Big River","Loser","Looks Like Rain","Ramble On Rose","Jack Straw","Peggy-O","El Paso","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Sugaree"],
   set2:["Samson and Delilah","Brown-Eyed Women","Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Good Lovin'","Uncle John's Band","Wharf Rat","Around and Around"],
-  encore:["Brokedown Palace"] },
+  encore:["Brokedown Palace"],
+  archiveId:"gd1977-05-11.sbd.miller.83196.flac16" },
 
 { id:"1977-05-12", dateDisplay:"May 12, 1977", venue:"Auditorium Theatre", city:"Chicago", state:"IL",
   set1:["Bertha","Me and My Uncle","Tennessee Jed","Cassidy","Peggy-O","Jack Straw","They Love Each Other","New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Dancin' in the Streets"],
@@ -1300,24 +1312,28 @@ const SHOWS = [
 { id:"1977-05-15", dateDisplay:"May 15, 1977", venue:"St. Louis Arena", city:"St. Louis", state:"MO",
   set1:["Bertha","Good Lovin'","Row Jimmy","New Minglewood Blues","Tennessee Jed",{t:"Lazy Lightning",seg:true},"Supplication","Jack-a-Roe","Passenger","Funicul\u00ec Funicul\u00e0","Brown-Eyed Women","Dancin' in the Streets"],
   set2:["Estimated Prophet","Eyes of the World","Drums","Samson and Delilah","Ship of Fools","St. Stephen","Iko Iko","Not Fade Away","Sugar Magnolia"],
-  encore:["Uncle John's Band"] },
+  encore:["Uncle John's Band"],
+  archiveId:"gd1977-05-15.sbd.bertha.31605.sbeok.flac24" },
 
 { id:"1977-05-17", dateDisplay:"May 17, 1977", venue:"Memorial Coliseum, University of Alabama", city:"Tuscaloosa", state:"AL",
   set1:["New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","El Paso","They Love Each Other","Jack Straw","Jack-a-Roe","Looks Like Rain","Tennessee Jed","Passenger","High Time","Big River","Sunrise","Scarlet Begonias","Fire on the Mountain"],
   set2:["Samson and Delilah","Bertha","Good Lovin'","Brown-Eyed Women","Estimated Prophet","Terrapin Station","Playing in the Band","Drums","Wharf Rat","Playing in the Band"],
-  encore:["Sugar Magnolia"] },
+  encore:["Sugar Magnolia"],
+  archiveId:"gd1977-05-17.sbd.leonard.1107.sbeok.shnf" },
 
 { id:"1977-05-18", dateDisplay:"May 18, 1977", venue:"Fox Theatre", city:"Atlanta", state:"GA",
   set1:["Deal","Cassidy","Jack-a-Roe","Mexicali Blues","Friend of the Devil","New Minglewood Blues","It Must Have Been the Roses",{t:"Lazy Lightning",seg:true},"Supplication","High Time","The Music Never Stopped"],
   set2:["Jack Straw","Ship of Fools","Estimated Prophet","Eyes of the World","Drums","The Other One","Stella Blue","Around and Around"],
-  encore:["Brokedown Palace"] },
+  encore:["Brokedown Palace"],
+  archiveId:"gd1977-05-18.sbd.miller.79012.flac16" },
 
 { id:"1977-05-19", dateDisplay:"May 19, 1977", venue:"Fox Theatre", city:"Atlanta", state:"GA",
   set1:["Promised Land",{t:"Sugaree",seg:true},"El Paso","Peggy-O","Looks Like Rain","Row Jimmy","Passenger","Loser","Dancin' in the Streets"],
   set2:["Samson and Delilah","Ramble On Rose","Estimated Prophet",{t:"Terrapin Station",seg:true},{t:"Playing in the Band",seg:true},{t:"Uncle John's Band",seg:true},{t:"Drums",seg:true},{t:"The Wheel",seg:true},{t:"China Doll",seg:true},"Playing in the Band"],
   encore:[],
   notes:"Officially released as Dick's Picks Vol. 29, paired with the Lakeland show two nights later.",
-  officialRelease:"Dick's Picks Vol. 29" },
+  officialRelease:"Dick's Picks Vol. 29",
+  archiveId:"gd1977-05-19.139377.sbd.latvala.miller.sirmick.flac1648" },
 
 { id:"1977-05-21", dateDisplay:"May 21, 1977", venue:"Lakeland Civic Center", city:"Lakeland", state:"FL",
   set1:["Bertha","Me and My Uncle","They Love Each Other","Cassidy","Jack-a-Roe","Jack Straw","Tennessee Jed","New Minglewood Blues","Row Jimmy","Passenger",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain"],
@@ -1338,19 +1354,22 @@ const SHOWS = [
   set2:["Scarlet Begonias","Fire on the Mountain","Estimated Prophet","He's Gone","Drums","The Other One","Wharf Rat","The Other One","The Wheel","Around and Around"],
   encore:["U.S. Blues"],
   notes:"Officially released as Dave's Picks Vol. 1, the very first release in that series.",
-  officialRelease:"Dave's Picks Vol. 1" },
+  officialRelease:"Dave's Picks Vol. 1",
+  archiveId:"gd1977-05-25.sbd.hamilton.1071.sbeok.shnf" },
 
 { id:"1977-05-26", dateDisplay:"May 26, 1977", venue:"Baltimore Civic Center", city:"Baltimore", state:"MD",
   set1:["The Music Never Stopped","Sugaree","Mama Tried","Sunrise","Deal","Passenger","Brown-Eyed Women","Looks Like Rain","Jack-a-Roe","New Minglewood Blues","Bertha"],
   set2:["Samson and Delilah","High Time","Big River","Terrapin Station","Estimated Prophet","Eyes of the World","Not Fade Away","Goin' Down the Road Feelin' Bad","Around and Around"],
-  encore:["Uncle John's Band"] },
+  encore:["Uncle John's Band"],
+  archiveId:"gd1977-05-26.sbd.serafin.11614.sbefail.shnf" },
 
 { id:"1977-05-28", dateDisplay:"May 28, 1977", venue:"Hartford Civic Center", city:"Hartford", state:"CT",
   set1:["Bertha","Good Lovin'","Sugaree","Jack Straw","Row Jimmy","New Minglewood Blues","Candyman","Passenger","Brown-Eyed Women","Promised Land"],
   set2:["Samson and Delilah","Tennessee Jed","Estimated Prophet","Playing in the Band","Terrapin Station","Not Fade Away","Wharf Rat","Playing in the Band","One More Saturday Night"],
   encore:["U.S. Blues"],
   notes:"Closing night of the band's 26-date spring East Coast tour. Officially released as To Terrapin: Hartford '77.",
-  officialRelease:"To Terrapin: Hartford '77" },
+  officialRelease:"To Terrapin: Hartford '77",
+  archiveId:"gd1977-05-28.sbd.ashley-bertha.12827.sbeok.flac16" },
 
 { id:"1977-06-04", dateDisplay:"Jun 4, 1977", venue:"The Fabulous Forum", city:"Inglewood", state:"CA",
   set1:["Promised Land","Tennessee Jed","El Paso","Peggy-O","Jack Straw","Friend of the Devil",{t:"Lazy Lightning",seg:true},"Supplication","Candyman","New Minglewood Blues","Brown-Eyed Women","The Music Never Stopped"],
@@ -1456,7 +1475,7 @@ const SHOWS = [
   set1:["Promised Land","They Love Each Other","Cassidy","Tennessee Jed","Mexicali Blues","Big River","Brown-Eyed Women","Lazy Lightning","Supplication","Deal"],
   set2:["Samson and Delilah","Candyman","Sunrise","Passenger","He's Gone","Drums","Not Fade Away","Stella Blue","Goin' Down the Road Feelin' Bad","Around and Around"],
   encore:["Casey Jones"],
-  flag:"Encore inferred as the closing song of the night; the source used didn't mark an explicit set/encore break." },
+  archiveId:"gd1977-10-28.sbd.miller.96159.sbeok.flac16" },
 
 { id:"1977-10-29", dateDisplay:"Oct 29, 1977", venue:"Chick Evans Field House, Northern Illinois University", city:"De Kalb", state:"IL",
   set1:["Might as Well","Jack Straw","Dire Wolf","Looks Like Rain","Loser","El Paso","Ramble On Rose","New Minglewood Blues","It Must Have Been the Roses","Let It Grow"],
@@ -1811,6 +1830,13 @@ function renderShowCard(show, opts){
       <svg class="show-card__archive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
       ${archiveLinkText}
     </a>`;
+  // Small badge in the collapsed header so a specific, confirmed
+  // recording is visible while browsing the list, before expanding a
+  // card — otherwise the archiveId vs. generic-search distinction is
+  // invisible until you open the show.
+  const recBadgeHtml = show.archiveId
+    ? ` <span class="show-card__rec-badge" role="img" aria-label="Confirmed recording — direct archive.org link" title="Confirmed recording — direct archive.org link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>`
+    : "";
   const encoreHtml = show.encore.length
     ? `<ul class="setlist-songs">${renderSongList(show.encore, opts.highlightQuery)}</ul>`
     : `<div class="no-encore">No encore documented for this show.</div>`;
@@ -1820,7 +1846,7 @@ function renderShowCard(show, opts){
     <button class="show-card__header" aria-expanded="${isOpen}" type="button">
       <span class="show-card__date">${show.dateDisplay}</span>
       <span class="show-card__body">
-        <span class="show-card__venue">${escapeHtml(show.venue)}</span>
+        <span class="show-card__venue">${escapeHtml(show.venue)}${recBadgeHtml}</span>
         <span class="show-card__place">${escapeHtml(place)}</span>
       </span>
       <svg class="show-card__chevron" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -2006,13 +2032,16 @@ function renderStatsTab(){
   const shortest = withLengths.reduce((a,b)=> b.total < a.total ? b : a);
   const avgLen = (totalPerformances / SHOWS.length).toFixed(1);
 
+  const confirmedRecordings = SHOWS.filter(s => s.archiveId).length;
+
   const tiles = [
     { value: SHOWS.length,   label: "Shows in 1977",        sub: "Feb 26 &ndash; Dec 31" },
     { value: mostPlayed[1],  label: "Most-played song",     sub: escapeHtml(mostPlayed[0]) },
     { value: totalUnique,    label: "Unique songs played",  sub: "across the whole tour" },
     { value: avgLen,         label: "Avg. songs / show",    sub: "set 1 + set 2 + encore" },
     { value: longest.total,  label: "Longest setlist",      sub: `${longest.show.dateDisplay} &middot; ${escapeHtml(longest.show.city)}` },
-    { value: shortest.total, label: "Shortest setlist",     sub: `${shortest.show.dateDisplay} &middot; ${escapeHtml(shortest.show.city)}` }
+    { value: shortest.total, label: "Shortest setlist",     sub: `${shortest.show.dateDisplay} &middot; ${escapeHtml(shortest.show.city)}` },
+    { value: `${confirmedRecordings}/${SHOWS.length}`, label: "Confirmed recordings", sub: "shows with a direct archive.org link, not just a date search" }
   ];
   document.getElementById("statTiles").innerHTML = tiles.map(t => `
     <div class="stat-tile">

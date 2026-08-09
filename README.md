@@ -32,11 +32,15 @@ Most shows were confirmed against **two or more independent sources**. Where sou
 ### One correction worth knowing
 *Sunshine Daydream*, the famous outdoor show at Veneta, Oregon, is often misfiled into 1977 — it's actually **August 27, 1972**. It's deliberately excluded from this dataset.
 
-### Shows with an inferred set break or encore (4)
-- **Oct 28, 1977** (Kansas City) — encore inferred as the closing song; source didn't mark an explicit break.
+### Tracking confirmed recordings
+Most shows link out to a generic, date-filtered archive.org search (`archive.org/details/GratefulDead?and[]=date:"1977-MM-DD"`) since most dates have several tapes floating around. Where a specific recording has been confirmed instead, its exact archive.org identifier is stored in that show's `archiveId` field, and the app links straight to it rather than a search. This is tracked live rather than hardcoded here: the Stats tab's "Confirmed recordings" tile and a small tape-reel badge next to the venue name in the Shows tab both read `archiveId` directly off the `SHOWS` data, so the count and the badges stay accurate as more identifiers get confirmed.
+
+### Shows with an inferred set break or encore (3)
 - **Nov 1, 1977** (Detroit) — set break placed at a documented tuning pause, not an explicit "Set 1 / Set 2" label.
 - **Nov 6, 1977** (Binghamton) — no encore is documented in the sources used; the show may simply not have had one.
 - **Dec 30, 1977** (Winterland) — the Set 2 / encore boundary is inferred from typical show shape.
+
+Oct 28, 1977 (Kansas City) was previously in this list — its "Casey Jones" encore is now confirmed via a specific archive.org recording.
 
 ### Shows with no encore documented (7)
 Apr 22 (Philadelphia), Apr 26 (Passaic), May 4 (Palladium), May 19 (Atlanta), Oct 1 (Portland), Oct 11 (Norman), Nov 6 (Binghamton). These may genuinely have ended without an encore rather than being missing data.

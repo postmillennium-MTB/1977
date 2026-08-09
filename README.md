@@ -49,6 +49,9 @@ Where a show in this dataset was released as part of an official Grateful Dead /
 
 | Date(s) | Venue | Release |
 |---|---|---|
+| Feb 26 | San Bernardino (tour opener) | Dave's Picks Vol. 29 |
+| Apr 29 & 30 | The Palladium, NYC | Download Series Vol. 1 |
+| May 3 & 4 | The Palladium, NYC | Dave's Picks Vol. 50 |
 | May 8 | Cornell (Barton Hall) | Added to the Library of Congress National Recording Registry, 2011 |
 | May 19 & 21 | Atlanta / Lakeland | Dick's Picks Vol. 29 |
 | May 22 | Hollywood, FL | Dick's Picks Vol. 3 |

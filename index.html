@@ -130,6 +130,55 @@
   --glow-1: rgba(255,77,168,0.22);
   --glow-2: rgba(199,99,255,0.20);
 }
+/* Pigpen — smoky blues-roadhouse palette for the band's original
+   frontman: teal-charcoal background, whiskey-amber and neon-sign-red
+   accents. A deliberately different hue family from Mydland's browns
+   so the two don't read as near-duplicates. */
+:root[data-theme="pigpen"]{
+  --bg-deep:      #223530;
+  --bg-panel:     #33504A;
+  --bg-panel-hi:  #45685F;
+  --paper:        #F1E4C4;
+  --paper-alt:    #E6D19E;
+  --ink:          #22201A;
+  --ink-soft:     #5E5640;
+  --gold:         #D9A548;
+  --gold-bright:  #EFC066;
+  --rose:         #C24B42;
+  --teal:         #4FA396;
+  --plum:         #7C5A82;
+  --text-light:   #EFE7D2;
+  --text-muted:   #C3D3CA;
+  --border-soft:  rgba(217,165,72,0.32);
+  --border-paper: rgba(34,32,26,0.14);
+  --shadow-deep:  0 12px 28px rgba(10,16,15,0.4);
+  --glow-1: rgba(217,165,72,0.16);
+  --glow-2: rgba(194,75,66,0.14);
+}
+/* Hornsby — warm piano-lounge palette for the early-90s touring
+   keyboardist: deep burgundy-plum background, brass-gold and dusty-
+   rose accents. */
+:root[data-theme="hornsby"]{
+  --bg-deep:      #3A2438;
+  --bg-panel:     #4E304A;
+  --bg-panel-hi:  #65406A;
+  --paper:        #F2E6D8;
+  --paper-alt:    #E7D2BC;
+  --ink:          #2C1B2A;
+  --ink-soft:     #6B4C66;
+  --gold:         #D9A24A;
+  --gold-bright:  #EDBE68;
+  --rose:         #C15D6E;
+  --teal:         #5AA0A0;
+  --plum:         #9C7EB0;
+  --text-light:   #F2E6D8;
+  --text-muted:   #D9BBD0;
+  --border-soft:  rgba(217,162,74,0.32);
+  --border-paper: rgba(44,27,42,0.14);
+  --shadow-deep:  0 12px 28px rgba(18,10,17,0.4);
+  --glow-1: rgba(217,162,74,0.16);
+  --glow-2: rgba(193,93,110,0.14);
+}
 
 /* ---------------------------------------------------------------------
    [2] RESET & BASE
@@ -171,17 +220,21 @@ a{ color: var(--gold-bright); }
 }
 
 /* ---------------------------------------------------------------------
-   [3a] UTILITY BAR — homepage link + color-scheme switcher
+   [3a] UTILITY BAR — color-scheme switcher + homepage link
+   Lives inside .site-header now (its first child), so it renders on
+   top of the header's hero-pattern background instead of in its own
+   plain bar above it — floating over the image, with the pattern
+   itself now reaching the literal top of the page.
 --------------------------------------------------------------------- */
 .utility-bar{
   max-width: 880px;
-  margin: 0 auto;
-  padding: 14px 16px 0;
+  margin: 0 auto 32px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  text-align: left;
 }
 .home-btn{
   display: inline-flex;
@@ -235,7 +288,7 @@ a{ color: var(--gold-bright); }
   border: 1px solid rgba(0,0,0,0.15);
 }
 .site-header{
-  padding: 56px 16px 34px;
+  padding: 18px 16px 34px;
   text-align: center;
   background-image:
     linear-gradient(180deg, rgba(8,6,14,0.32) 0%, rgba(8,6,14,0.72) 70%, var(--bg-deep) 100%),
@@ -803,7 +856,6 @@ a{ color: var(--gold-bright); }
 @media (max-width: 480px){
   .setlist-grid{ grid-template-columns: 1fr; }
   .stat-grid{ grid-template-columns: repeat(2, 1fr); }
-  .site-header{ padding-top: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -813,28 +865,35 @@ a{ color: var(--gold-bright); }
 </head>
 <body>
 
-<div class="utility-bar">
-  <a class="home-btn" href="https://www.postmillenniumrenaissance.com">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/></svg>
-    Post Millennium Renaissance
-  </a>
-  <div class="theme-switcher" role="group" aria-label="Color scheme">
-    <button class="theme-btn" id="theme-btn-godchaux" data-theme="godchaux" aria-pressed="true">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#2E2850 0 33%, #E6AD44 0 66%, #D35B4D 0 100%)"></span>
-      Godchaux
-    </button>
-    <button class="theme-btn" id="theme-btn-mydland" data-theme="mydland" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#3B2812 0 33%, #D6A03A 0 66%, #C6642A 0 100%)"></span>
-      Mydland
-    </button>
-    <button class="theme-btn" id="theme-btn-welnick" data-theme="welnick" aria-pressed="false">
-      <span class="theme-btn__swatch" style="background:conic-gradient(#291431 0 33%, #FF4DA8 0 66%, #C763FF 0 100%)"></span>
-      Welnick
-    </button>
-  </div>
-</div>
-
 <header class="site-header">
+  <div class="utility-bar">
+    <div class="theme-switcher" role="group" aria-label="Color scheme">
+      <button class="theme-btn" id="theme-btn-godchaux" data-theme="godchaux" aria-pressed="true">
+        <span class="theme-btn__swatch" style="background:conic-gradient(#2E2850 0 33%, #E6AD44 0 66%, #D35B4D 0 100%)"></span>
+        Godchaux
+      </button>
+      <button class="theme-btn" id="theme-btn-mydland" data-theme="mydland" aria-pressed="false">
+        <span class="theme-btn__swatch" style="background:conic-gradient(#3B2812 0 33%, #D6A03A 0 66%, #C6642A 0 100%)"></span>
+        Mydland
+      </button>
+      <button class="theme-btn" id="theme-btn-welnick" data-theme="welnick" aria-pressed="false">
+        <span class="theme-btn__swatch" style="background:conic-gradient(#291431 0 33%, #FF4DA8 0 66%, #C763FF 0 100%)"></span>
+        Welnick
+      </button>
+      <button class="theme-btn" id="theme-btn-pigpen" data-theme="pigpen" aria-pressed="false">
+        <span class="theme-btn__swatch" style="background:conic-gradient(#223530 0 33%, #D9A548 0 66%, #C24B42 0 100%)"></span>
+        Pigpen
+      </button>
+      <button class="theme-btn" id="theme-btn-hornsby" data-theme="hornsby" aria-pressed="false">
+        <span class="theme-btn__swatch" style="background:conic-gradient(#3A2438 0 33%, #D9A24A 0 66%, #C15D6E 0 100%)"></span>
+        Hornsby
+      </button>
+    </div>
+    <a class="home-btn" href="https://www.postmillenniumrenaissance.com">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-9"/></svg>
+      Post Millennium Renaissance
+    </a>
+  </div>
   <div class="site-header__eyebrow">Post Millennium Renaissance &middot; Field Guide</div>
   <h1 class="site-header__title">Grateful Dead <em>1977</em></h1>
   <div class="site-header__sub">SETLIST ATLAS &middot; 60 SHOWS &middot; FEB&ndash;DEC</div>
@@ -989,6 +1048,12 @@ a{ color: var(--gold-bright); }
       SHOWS array). If a new show's city isn't already a key there, add
       its [lng, lat] as "City|ST" — otherwise that show is simply
       skipped on the map (everything else about it still works fine).
+   8. If a show was officially released (Dick's/Dave's Picks, Road
+      Trips, Download Series...) but you don't have its exact
+      archiveId, set "officialRelease" to the release's name instead —
+      the archive.org link still falls back to the date search, but
+      its button text names the release so it's obvious which result
+      to pick once there.
 
    SONG OBJECT SHAPE
    ------------------------------------------------------------------
@@ -1010,7 +1075,8 @@ const SHOW_TEMPLATE = {
   encore: [],                    // empty array if no encore
   notes: "",                     // optional 1-sentence factual note
   flag: "",                      // optional: note if a set break/encore is inferred
-  archiveId: ""                  // optional: exact archive.org identifier, see note 6 above
+  archiveId: "",                 // optional: exact archive.org identifier, see note 6 above
+  officialRelease: ""            // optional: release name if archiveId isn't known, see note 8 above
 };
 
 const SHOWS = [
@@ -1019,7 +1085,8 @@ const SHOWS = [
   set1:["Terrapin Station","New Minglewood Blues","They Love Each Other","Estimated Prophet","Sugaree","Mama Tried","Deal",{t:"Playing in the Band",seg:true},"The Wheel","Playing in the Band"],
   set2:["Samson and Delilah","Tennessee Jed","The Music Never Stopped","Help on the Way","Slipknot!","Franklin's Tower","Promised Land","Eyes of the World","Dancin' in the Streets","Around and Around"],
   encore:["U.S. Blues"],
-  notes:"Tour opener, and the live debut of the Terrapin Station-era stage show a few months before that studio album's release." },
+  notes:"Tour opener, and the live debut of the Terrapin Station-era stage show a few months before that studio album's release. Officially released as Dave's Picks Vol. 29.",
+  officialRelease:"Dave's Picks Vol. 29" },
 
 { id:"1977-02-27", dateDisplay:"Feb 27, 1977", venue:"Robertson Gym, UC Santa Barbara", city:"Goleta", state:"CA",
   set1:["New Minglewood Blues","Loser","El Paso","Ramble On Rose","Estimated Prophet","Peggy-O","Good Lovin'","Mississippi Half-Step Uptown Toodeloo","The Music Never Stopped","Scarlet Begonias"],
@@ -1070,12 +1137,15 @@ const SHOWS = [
   set1:["Help on the Way","Slipknot!","Franklin's Tower","New Minglewood Blues","Tennessee Jed","Cassidy","They Love Each Other","Big River","Loser","The Music Never Stopped"],
   set2:["Samson and Delilah","Sugaree","El Paso","Brown-Eyed Women","Estimated Prophet","Scarlet Begonias","Goin' Down the Road Feelin' Bad","Drums","The Wheel","Wharf Rat","Around and Around"],
   encore:["Uncle John's Band"],
-  notes:"First of a five-night stand at the Palladium — the run later remembered for Hells Angels wandering the dressing rooms and John Belushi stopping by." },
+  notes:"First of a five-night stand at the Palladium — the run later remembered for Hells Angels wandering the dressing rooms and John Belushi stopping by. Officially released, with Apr 30, as Download Series Vol. 1.",
+  officialRelease:"Download Series Vol. 1" },
 
 { id:"1977-04-30", dateDisplay:"Apr 30, 1977", venue:"The Palladium", city:"New York", state:"NY",
   set1:["The Music Never Stopped","Bertha","It's All Over Now","Deal","Mama Tried","Me and My Uncle","Peggy-O","Looks Like Rain","Mississippi Half-Step Uptown Toodeloo","Promised Land"],
   set2:["Scarlet Begonias","Fire on the Mountain","Good Lovin'","Friend of the Devil","Estimated Prophet","St. Stephen","Not Fade Away","Stella Blue","St. Stephen","One More Saturday Night"],
-  encore:["Terrapin Station"] },
+  encore:["Terrapin Station"],
+  notes:"Officially released, with Apr 29, as Download Series Vol. 1.",
+  officialRelease:"Download Series Vol. 1" },
 
 { id:"1977-05-01", dateDisplay:"May 1, 1977", venue:"The Palladium", city:"New York", state:"NY",
   set1:["Might as Well","El Paso","Ramble On Rose","Cassidy","They Love Each Other",{t:"Lazy Lightning",seg:true},"Supplication","It Must Have Been the Roses","Estimated Prophet","Tennessee Jed","Sunrise","Samson and Delilah"],
@@ -1085,12 +1155,16 @@ const SHOWS = [
 { id:"1977-05-03", dateDisplay:"May 3, 1977", venue:"The Palladium", city:"New York", state:"NY",
   set1:["Promised Land","Bertha","Me and My Uncle","Peggy-O","Jack Straw","Row Jimmy",{t:"Lazy Lightning",seg:true},"Supplication","Deal","Good Lovin'","Ship of Fools","The Music Never Stopped"],
   set2:["Might as Well","Estimated Prophet","Sugaree","Samson and Delilah","Friend of the Devil","Eyes of the World","Wharf Rat","Not Fade Away","Around and Around"],
-  encore:["Uncle John's Band"] },
+  encore:["Uncle John's Band"],
+  notes:"Officially released, with May 4, as Dave's Picks Vol. 50.",
+  officialRelease:"Dave's Picks Vol. 50" },
 
 { id:"1977-05-04", dateDisplay:"May 4, 1977", venue:"The Palladium", city:"New York", state:"NY",
   set1:["Mississippi Half-Step Uptown Toodeloo","Big River","They Love Each Other","New Minglewood Blues","It Must Have Been the Roses","Cassidy","Deal","Looks Like Rain","Brown-Eyed Women","Dancin' in the Streets"],
   set2:["Estimated Prophet","Scarlet Begonias","Fire on the Mountain","Terrapin Station","Playing in the Band","Comes a Time","Playing in the Band"],
-  encore:[] },
+  encore:[],
+  notes:"Officially released, with May 3, as Dave's Picks Vol. 50.",
+  officialRelease:"Dave's Picks Vol. 50" },
 
 { id:"1977-05-05", dateDisplay:"May 5, 1977", venue:"Veterans' Memorial Coliseum", city:"New Haven", state:"CT",
   set1:["Promised Land","Sugaree","Mama Tried","El Paso","Tennessee Jed","Looks Like Rain","Deal",{t:"Lazy Lightning",seg:true},"Supplication","Peggy-O","The Music Never Stopped"],
@@ -1147,25 +1221,29 @@ const SHOWS = [
   set1:["Promised Land",{t:"Sugaree",seg:true},"El Paso","Peggy-O","Looks Like Rain","Row Jimmy","Passenger","Loser","Dancin' in the Streets"],
   set2:["Samson and Delilah","Ramble On Rose","Estimated Prophet",{t:"Terrapin Station",seg:true},{t:"Playing in the Band",seg:true},{t:"Uncle John's Band",seg:true},{t:"Drums",seg:true},{t:"The Wheel",seg:true},{t:"China Doll",seg:true},"Playing in the Band"],
   encore:[],
-  notes:"Officially released as Dick's Picks Vol. 29, paired with the Lakeland show two nights later." },
+  notes:"Officially released as Dick's Picks Vol. 29, paired with the Lakeland show two nights later.",
+  officialRelease:"Dick's Picks Vol. 29" },
 
 { id:"1977-05-21", dateDisplay:"May 21, 1977", venue:"Lakeland Civic Center", city:"Lakeland", state:"FL",
   set1:["Bertha","Me and My Uncle","They Love Each Other","Cassidy","Jack-a-Roe","Jack Straw","Tennessee Jed","New Minglewood Blues","Row Jimmy","Passenger",{t:"Scarlet Begonias",seg:true},"Fire on the Mountain"],
   set2:["Samson and Delilah","Brown-Eyed Women","Estimated Prophet","He's Gone","Drums","The Other One","Comes a Time","St. Stephen","Not Fade Away","St. Stephen","One More Saturday Night"],
   encore:["U.S. Blues"],
-  notes:"Officially released as Dick's Picks Vol. 29, paired with the Atlanta show two nights before." },
+  notes:"Officially released as Dick's Picks Vol. 29, paired with the Atlanta show two nights before.",
+  officialRelease:"Dick's Picks Vol. 29" },
 
 { id:"1977-05-22", dateDisplay:"May 22, 1977", venue:"The Sportatorium", city:"Hollywood", state:"FL",
   set1:["The Music Never Stopped","Sugaree","El Paso","Peggy-O","New Minglewood Blues","Friend of the Devil",{t:"Lazy Lightning",seg:true},"Supplication","Ramble On Rose","Dancin' in the Streets"],
   set2:["Help on the Way","Slipknot!","Franklin's Tower","Samson and Delilah","Brown-Eyed Women","Good Lovin'","Sunrise","Estimated Prophet","Eyes of the World","Wharf Rat","Terrapin Station","Morning Dew"],
   encore:["Sugar Magnolia"],
-  notes:"Officially released as Dick's Picks Vol. 3 \u2014 the show most people mean when they say \u201cDick's Picks Three,\u201d sometimes misremembered as the Lakeland date the night before." },
+  notes:"Officially released as Dick's Picks Vol. 3 \u2014 the show most people mean when they say \u201cDick's Picks Three,\u201d sometimes misremembered as the Lakeland date the night before.",
+  officialRelease:"Dick's Picks Vol. 3" },
 
 { id:"1977-05-25", dateDisplay:"May 25, 1977", venue:"The Mosque", city:"Richmond", state:"VA",
   set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","They Love Each Other","Mexicali Blues","Peggy-O","Cassidy","Loser",{t:"Lazy Lightning",seg:true},"Supplication","Brown-Eyed Women","Promised Land"],
   set2:["Scarlet Begonias","Fire on the Mountain","Estimated Prophet","He's Gone","Drums","The Other One","Wharf Rat","The Other One","The Wheel","Around and Around"],
   encore:["U.S. Blues"],
-  notes:"Officially released as Dave's Picks Vol. 1, the very first release in that series." },
+  notes:"Officially released as Dave's Picks Vol. 1, the very first release in that series.",
+  officialRelease:"Dave's Picks Vol. 1" },
 
 { id:"1977-05-26", dateDisplay:"May 26, 1977", venue:"Baltimore Civic Center", city:"Baltimore", state:"MD",
   set1:["The Music Never Stopped","Sugaree","Mama Tried","Sunrise","Deal","Passenger","Brown-Eyed Women","Looks Like Rain","Jack-a-Roe","New Minglewood Blues","Bertha"],
@@ -1176,7 +1254,8 @@ const SHOWS = [
   set1:["Bertha","Good Lovin'","Sugaree","Jack Straw","Row Jimmy","New Minglewood Blues","Candyman","Passenger","Brown-Eyed Women","Promised Land"],
   set2:["Samson and Delilah","Tennessee Jed","Estimated Prophet","Playing in the Band","Terrapin Station","Not Fade Away","Wharf Rat","Playing in the Band","One More Saturday Night"],
   encore:["U.S. Blues"],
-  notes:"Closing night of the band's 26-date spring East Coast tour. Officially released as To Terrapin: Hartford '77." },
+  notes:"Closing night of the band's 26-date spring East Coast tour. Officially released as To Terrapin: Hartford '77.",
+  officialRelease:"To Terrapin: Hartford '77" },
 
 { id:"1977-06-04", dateDisplay:"Jun 4, 1977", venue:"The Fabulous Forum", city:"Inglewood", state:"CA",
   set1:["Promised Land","Tennessee Jed","El Paso","Peggy-O","Jack Straw","Friend of the Devil",{t:"Lazy Lightning",seg:true},"Supplication","Candyman","New Minglewood Blues","Brown-Eyed Women","The Music Never Stopped"],
@@ -1187,18 +1266,22 @@ const SHOWS = [
   set1:["Bertha","Jack Straw","Tennessee Jed","Looks Like Rain","Peggy-O","Funicul\u00ec Funicul\u00e0","El Paso","Friend of the Devil","The Music Never Stopped"],
   set2:[{t:"Scarlet Begonias",seg:true},"Fire on the Mountain","Good Lovin'","Candyman","Estimated Prophet","He's Gone","Drums","Samson and Delilah","Terrapin Station","Morning Dew","Around and Around","Uncle John's Band"],
   encore:["U.S. Blues"],
-  notes:"First of a three-night Winterland homecoming stand, later released in full as Winterland June 1977: The Complete Recordings." },
+  notes:"First of a three-night Winterland homecoming stand, later released in full as Winterland June 1977: The Complete Recordings.",
+  officialRelease:"Winterland June 1977: The Complete Recordings" },
 
 { id:"1977-06-08", dateDisplay:"Jun 8, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
   set1:["New Minglewood Blues","Sugaree","Mexicali Blues","Row Jimmy","Passenger","Sunrise","Brown-Eyed Women","It's All Over Now","Jack-a-Roe",{t:"Lazy Lightning",seg:true},"Supplication"],
   set2:["Bertha","Good Lovin'","Ramble On Rose","Estimated Prophet","Eyes of the World","Drums","The Other One","Wharf Rat","Not Fade Away","Goin' Down the Road Feelin' Bad","Johnny B. Goode"],
-  encore:["Brokedown Palace"] },
+  encore:["Brokedown Palace"],
+  notes:"Officially released, with Jun 7 and 9, as Winterland June 1977: The Complete Recordings.",
+  officialRelease:"Winterland June 1977: The Complete Recordings" },
 
 { id:"1977-06-09", dateDisplay:"Jun 9, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
   set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","They Love Each Other","Cassidy","Sunrise","Deal","Looks Like Rain","Loser","The Music Never Stopped"],
   set2:["Samson and Delilah","Funicul\u00ec Funicul\u00e0","Help on the Way","Slipknot!","Franklin's Tower","Estimated Prophet","St. Stephen","Not Fade Away","Drums","St. Stephen","Terrapin Station","Sugar Magnolia"],
   encore:["U.S. Blues","One More Saturday Night"],
-  notes:"Closes the spring/summer leg — the band didn't tour again until Englishtown in September." },
+  notes:"Closes the spring/summer leg — the band didn't tour again until Englishtown in September. Officially released, with Jun 7 and 8, as Winterland June 1977: The Complete Recordings.",
+  officialRelease:"Winterland June 1977: The Complete Recordings" },
 
 { id:"1977-09-03", dateDisplay:"Sep 3, 1977", venue:"Raceway Park", city:"Englishtown", state:"NJ",
   set1:["Promised Land","They Love Each Other","Me and My Uncle","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Peggy-O","New Minglewood Blues","Friend of the Devil","The Music Never Stopped"],
@@ -1227,7 +1310,8 @@ const SHOWS = [
   set1:["Casey Jones","Jack Straw","Sunrise","Brown-Eyed Women","El Paso","Dupree's Diamond Blues","Let It Grow","Deal"],
   set2:["Samson and Delilah","Scarlet Begonias","Fire on the Mountain","Funicul\u00ec Funicul\u00e0","Playing in the Band","Drums","The Wheel","Truckin'","The Other One","Wharf Rat","Sugar Magnolia"],
   encore:["Johnny B. Goode"],
-  notes:"Both Portland nights were released together as Dave's Picks Vol. 45 — the return of \u201cCasey Jones\u201d and \u201cDupree's Diamond Blues\u201d to the repertoire after a long absence." },
+  notes:"Both Portland nights were released together as Dave's Picks Vol. 45 — the return of \u201cCasey Jones\u201d and \u201cDupree's Diamond Blues\u201d to the repertoire after a long absence.",
+  officialRelease:"Dave's Picks Vol. 45" },
 
 { id:"1977-10-06", dateDisplay:"Oct 6, 1977", venue:"Arizona State University Activity Center", city:"Tempe", state:"AZ",
   set1:["Promised Land","Tennessee Jed","Jack Straw","Dire Wolf","Looks Like Rain","Loser","New Minglewood Blues","They Love Each Other","The Music Never Stopped"],
@@ -1248,7 +1332,8 @@ const SHOWS = [
   set1:["Help on the Way","Slipknot!","Franklin's Tower","Jack Straw","Peggy-O","El Paso","Sunrise","Deal","Let It Grow"],
   set2:["Dancin' in the Streets","Dire Wolf","Estimated Prophet","Eyes of the World","Not Fade Away","Wharf Rat","Around and Around"],
   encore:[],
-  notes:"Officially released as Road Trips Vol. 1 No. 2." },
+  notes:"Officially released as Road Trips Vol. 1 No. 2.",
+  officialRelease:"Road Trips Vol. 1 No. 2" },
 
 { id:"1977-10-12", dateDisplay:"Oct 12, 1977", venue:"Manor Downs", city:"Austin", state:"TX",
   set1:["Promised Land","They Love Each Other","Me and My Uncle","Candyman","Passenger","Brown-Eyed Women","El Paso","Friend of the Devil","Lazy Lightning","Supplication","Deal"],
@@ -1308,7 +1393,8 @@ const SHOWS = [
   set1:["New Minglewood Blues","Mississippi Half-Step Uptown Toodeloo","Looks Like Rain","Dire Wolf",{t:"Mama Tried",seg:true},"Big River","Candyman","Jack Straw","Deal"],
   set2:[{t:"Jam",seg:true},{t:"Eyes of the World",seg:true},"Samson and Delilah","It Must Have Been the Roses",{t:"Estimated Prophet",seg:true},{t:"He's Gone",seg:true},{t:"Drums",seg:true},{t:"The Other One",seg:true},{t:"Black Peter",seg:true},"Sugar Magnolia"],
   encore:["One More Saturday Night"],
-  notes:"Officially released as Dick's Picks Vol. 34, paired with bonus material from the Toronto show three nights earlier." },
+  notes:"Officially released as Dick's Picks Vol. 34, paired with bonus material from the Toronto show three nights earlier.",
+  officialRelease:"Dick's Picks Vol. 34" },
 
 { id:"1977-11-06", dateDisplay:"Nov 6, 1977", venue:"Broome County Veterans Memorial Arena", city:"Binghamton", state:"NY",
   set1:["Mississippi Half-Step Uptown Toodeloo","Jack Straw","Tennessee Jed","Mexicali Blues","Me and My Uncle","Friend of the Devil","New Minglewood Blues","Dupree's Diamond Blues","Passenger","Dire Wolf","The Music Never Stopped"],
@@ -1327,7 +1413,8 @@ const SHOWS = [
   set1:["Jack Straw","They Love Each Other","Mama Tried","Loser","Looks Like Rain","Tennessee Jed","New Minglewood Blues","Sugaree","Promised Land"],
   set2:[{t:"Bertha",seg:true},"Good Lovin'","It Must Have Been the Roses","Sunrise",{t:"Playing in the Band",seg:true},{t:"China Cat Sunflower",seg:true},{t:"I Know You Rider",seg:true},{t:"China Doll",seg:true},{t:"Playing in the Band",seg:true},{t:"Drums",seg:true},{t:"Not Fade Away",seg:true},"Playing in the Band"],
   encore:["Terrapin Station","Johnny B. Goode"],
-  notes:"Officially released as Dick's Picks Vol. 10, with bonus tracks from the following night." },
+  notes:"Officially released as Dick's Picks Vol. 10, with bonus tracks from the following night.",
+  officialRelease:"Dick's Picks Vol. 10" },
 
 { id:"1977-12-30", dateDisplay:"Dec 30, 1977", venue:"Winterland Arena", city:"San Francisco", state:"CA",
   set1:["Mississippi Half-Step Uptown Toodeloo","Me and My Uncle","Dire Wolf","Looks Like Rain","Row Jimmy","Big River","Peggy-O","Passenger","Ramble On Rose","Let It Grow"],
@@ -1597,13 +1684,23 @@ function renderShowCard(show, opts){
   // archive.org's GratefulDead collection — most dates have several
   // tapes (soundboard, audience, matrix...), so this always resolves
   // to whatever's actually there instead of a guessed/stale identifier.
+  // When a show has a known officialRelease but no confirmed archiveId,
+  // the URL is still the same reliable date search (an unverified
+  // guess at a smarter query risks a broken/empty link), but the
+  // button text names the release so it's obvious which result to
+  // pick once there.
   const archiveUrl = show.archiveId
     ? `https://archive.org/details/${encodeURIComponent(show.archiveId)}`
     : `https://archive.org/details/GratefulDead?and%5B%5D=date%3A%22${show.id}%22`;
+  const archiveLinkText = show.archiveId
+    ? "Listen on archive.org"
+    : show.officialRelease
+      ? `Find ${escapeHtml(show.officialRelease)} on archive.org`
+      : "Listen on archive.org";
   const archiveLinkHtml = `
     <a class="show-card__archive-link" href="${archiveUrl}" target="_blank" rel="noopener noreferrer">
       <svg class="show-card__archive-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      Listen on archive.org
+      ${archiveLinkText}
     </a>`;
   const encoreHtml = show.encore.length
     ? `<ul class="setlist-songs">${renderSongList(show.encore, opts.highlightQuery)}</ul>`
@@ -1924,11 +2021,11 @@ function renderBarChart(){
     const barH = rowH - 8;
     const labelY = yTop + rowH / 2 + 3.5;
     bars += `
-      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="9.5">${escapeHtml(truncate(song, 20))}</text>
+      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="8.5">${escapeHtml(truncate(song, 20))}</text>
       <rect x="${leftPad}" y="${barY}" width="${barW.toFixed(1)}" height="${barH}" rx="2.5" fill="${THEME.gold}">
         <title>${escapeHtml(song)}: ${count} performances</title>
       </rect>
-      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="10" fill="${THEME.goldBright}" font-weight="600">${count}</text>`;
+      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="9" fill="${THEME.goldBright}" font-weight="600">${count}</text>`;
   });
 
   document.getElementById("chartBar").innerHTML =
@@ -1951,11 +2048,11 @@ function renderStateBarChart(){
     const barH = rowH - 6;
     const labelY = yTop + rowH / 2 + 3.2;
     bars += `
-      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="9.5">${escapeHtml(state)}</text>
+      <text x="${leftPad - 8}" y="${labelY}" text-anchor="end" font-size="8.5">${escapeHtml(state)}</text>
       <rect x="${leftPad}" y="${barY}" width="${barW.toFixed(1)}" height="${barH}" rx="2.5" fill="${THEME.rose}">
         <title>${escapeHtml(state)}: ${count} show${count === 1 ? "" : "s"}</title>
       </rect>
-      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="9.5" fill="${THEME.gold}" font-weight="600">${count}</text>`;
+      <text x="${(leftPad + barW + 6).toFixed(1)}" y="${labelY}" font-size="8.5" fill="${THEME.gold}" font-weight="600">${count}</text>`;
   });
 
   document.getElementById("chartBarState").innerHTML =

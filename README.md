@@ -13,7 +13,7 @@ A single-file, zero-dependency HTML tool documenting every show the Grateful Dea
 | **Shows** | All 60 shows, chronological, grouped into 5 tour legs. Tap a date to expand the full setlist, which also links out to a date-filtered archive.org search for that night's recordings. |
 | **Search** | Toggle between searching venues/cities/states and searching songs. Song mode highlights the match and shows how many of the 60 shows it appeared at. |
 | **Stats** | Headline numbers (most-played song, unique songs, longest/shortest setlist, etc.), a song search box, and a full sortable ranking table of every song played. |
-| **Graphics** | Seven charts: most-played songs (bar), shows by state (bar), shows by state (pie, top 5 + "Other"), set 1/set 2/encore split (pie), shows by region (pie), setlist length across the year (scatter), and songs per set across the year (scatter, toggled between Set One / Set Two / Encore). |
+| **Graphics** | Eight charts: a US map tracing the tour route in chronological order, color-coded by tour leg; most-played songs (bar); shows by state (bar); shows by state (pie, top 5 + "Other"); set 1/set 2/encore split (pie); shows by region (pie); setlist length across the year (scatter); and songs per set across the year (scatter, toggled between Set One / Set Two / Encore). |
 | **Quiz** | Multiple-choice trivia generated live from the `SHOWS` data — "how many times was X played?" and "which song was played more, X or Y?" — so it can't drift out of sync as shows are added. |
 
 ---
@@ -71,8 +71,9 @@ The `SHOWS` array and a `SHOW_TEMPLATE` object with full instructions live at th
 2. List songs in performance order. Use `{t:"Song Title", seg:true}` instead of a plain string for any song that segues into the next one (renders as "Song Title >").
 3. **Reuse existing spelling** for repeated songs — search the file first (e.g. always "Playing in the Band", never "Playin' in the Band") or the Stats tab will count it as a separate song.
 4. If you're not sure exactly where a set break or encore falls, add a `flag` string rather than guessing silently.
+5. If the city isn't already in `CITY_COORDS` (just above the chart builders), add its `[lng, lat]` there too, keyed `"City|ST"` — otherwise that show just won't appear on the tour-route map (everything else about it still works fine).
 
-Everything else — the Search tab, Stats tab, and all six charts — is computed from the `SHOWS` array at load time, so adding a show automatically flows through everywhere. Nothing else needs to be touched.
+Everything else — the Search tab, Stats tab, and all eight charts — is computed from the `SHOWS` array at load time, so adding a show automatically flows through everywhere except the one step above. Nothing else needs to be touched.
 
 ---
 

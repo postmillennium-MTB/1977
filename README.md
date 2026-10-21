@@ -91,3 +91,11 @@ Since this is Grateful Dead content rather than mountain biking, it uses its own
 The header is a hero band using the PMR desert pattern (`moose-bolt-tile.webp` — a 640px, ~65KB derivative of the full-res `moose-bolt.png` asset, tiled as a CSS background with a dark scrim gradient fading into the page below it for text legibility).
 
 Three color schemes are available from the buttons at the top, named after the band's keyboardists in the order they held the chair: **Godchaux** (the default — Keith Godchaux was actually on keys for this '77 tour, in the same deep-indigo/marigold palette as the rest of the site), **Mydland** (1979–1990, restyled as a 70s/80s wood-paneled-den palette — espresso browns, harvest gold, rust, avocado green), and **Welnick** (1990–1995, restyled as early-90s neon — near-black background with hot-pink and electric-violet accents).
+
+## License
+
+Copyright (c) 2026 Post Millennium Renaissance (https://www.postmillenniumrenaissance.com).
+
+Released under the [PolyForm Noncommercial License 1.0.0](LICENSE). In short: free to use, copy, modify and share for any noncommercial purpose, including personal use, research, education, and use by charities, environmental-protection organizations and government institutions. Commercial use needs a separate license; ask through postmillenniumrenaissance.com. Copies must keep the `Required Notice:` line in `LICENSE`. The license text controls over this summary.
+
+Facts, figures and quotations taken from third-party studies and sources remain the property of their authors. This license covers only this project's own code, selection and arrangement of material, and original text. Third-party components keep their own licenses.
